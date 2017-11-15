@@ -1,0 +1,91 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.leebeomwoo.viewbody_final.QnA.ReadFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+
+    <RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+        android:layout_alignParentBottom="true">
+
+        <TextView
+            android:text="@string/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true"
+            android:id="@+id/textView4"
+            android:layout_toStartOf="@+id/qna_read_title"
+            android:layout_above="@+id/qna_read_text" />
+
+        <TextView
+            android:id="@+id/qna_read_title"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_height="30dp"
+            android:layout_width="300dp"
+            android:fadingEdge="horizontal|vertical" />
+
+        <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/qna_read_text"
+        tools:ignore="ContentDescription"
+            android:layout_below="@+id/qna_read_title"
+            android:layout_alignParentStart="true" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/reply_add_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="300dp"
+            android:layout_marginTop="400dp"
+            android:background="@android:drawable/ic_input_add"
+            android:clickable="true"
+            android:src="@drawable/plus"
+            app:fabSize="normal" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            app:fabSize="mini"
+            android:id="@+id/reply_update_btn"
+            android:layout_alignTop="@+id/reply_add_btn"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="100dp"
+            android:visibility="invisible"
+            android:src="@android:drawable/ic_menu_edit" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            app:fabSize="mini"
+            android:id="@+id/reply_cancel_btn"
+            android:layout_alignTop="@+id/reply_add_btn"
+            android:layout_toLeftOf="@+id/reply_update_btn"
+            android:visibility="invisible"
+            android:layout_marginEnd="10dp"
+            tools:ignore="RtlHardcoded"
+            android:src="@android:drawable/ic_delete" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:id="@+id/reply_container"
+            android:layout_height="100dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentStart="true">
+
+        </FrameLayout>
+
+    </RelativeLayout>
+
+</RelativeLayout>

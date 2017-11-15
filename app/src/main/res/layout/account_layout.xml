@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/appbar_acc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar_acc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/viewbodyappbarcolor"
+            app:layout_scrollFlags="scroll|enterAlways|snap">
+
+            <ImageView
+                android:id="@+id/toolbar_image"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_marginEnd="10dp"
+                android:padding="3dp"
+                android:scaleType="fitCenter"
+                app:srcCompat="@drawable/logomain"
+                tools:ignore="ContentDescription" />
+
+            <ImageView
+                android:id="@+id/toolbar_title"
+                android:layout_width="150dp"
+                android:layout_height="55dp"
+                android:layout_marginTop="5dp"
+                android:padding="5dp"
+                android:scaleType="fitCenter"
+                android:textAppearance="@style/Base.TextAppearance.Widget.AppCompat.Toolbar.Title"
+                app:srcCompat="@drawable/maintext_light"
+                tools:ignore="ContentDescription" />
+        </android.support.v7.widget.Toolbar>
+
+    </android.support.design.widget.AppBarLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="200dp">
+
+        <EditText
+            android:id="@+id/editText"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="14dp"
+            android:ems="10"
+            android:hint="@string/id_user"
+            android:textAlignment="center" />
+
+        <EditText
+            android:id="@+id/editText2"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_alignEnd="@+id/editText"
+            android:layout_below="@+id/editText"
+            android:layout_marginTop="10dp"
+            android:ems="10"
+            android:hint="@string/password"
+            android:inputType="textPassword"
+            android:textAlignment="center" />
+
+        <Button
+            android:id="@+id/join_btn"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignStart="@+id/editText2"
+            android:layout_marginBottom="11dp"
+            android:text="@string/join" />
+
+        <Button
+            android:id="@+id/out_btn"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/join_btn"
+            android:layout_alignBottom="@+id/join_btn"
+            android:layout_alignEnd="@+id/editText2"
+            android:text="@string/join_out" />
+
+        <Button
+            android:id="@+id/login_btn"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:text="@string/login"
+            android:layout_alignBaseline="@+id/out_btn"
+            android:layout_alignBottom="@+id/out_btn"
+            android:layout_centerHorizontal="true" />
+    </RelativeLayout>
+
+    <Button
+        android:id="@+id/kakao_Btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="50dp"
+        android:text="@string/kakao"
+        android:textAlignment="center"
+        android:textSize="30sp" />
+
+    <Button
+        android:id="@+id/googleaccount_Btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="5dp"
+        android:text="@string/googleaccount"
+        android:textAlignment="center"
+        android:textSize="30sp" />
+
+    <Button
+        android:id="@+id/facebook_Btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="5dp"
+        android:text="@string/facebook"
+        android:textAlignment="center"
+        android:textSize="30sp" />
+</LinearLayout>

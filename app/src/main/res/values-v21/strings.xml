@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="permission_request">카메라사용에 대한 허가를 요청합니다.</string>
+</resources>

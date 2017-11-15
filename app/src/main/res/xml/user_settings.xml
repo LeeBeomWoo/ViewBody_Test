@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        android:title="@string/acount">
+        <Preference
+            android:key="username"
+            android:summary="Test"
+            android:title="사용자이름" />
+
+        <EditTextPreference
+            android:title="Email"
+            android:summary="rishabh.pugalia@gmail.com"
+            android:key="email" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/category">
+
+        <PreferenceScreen
+            android:key="upperbone"
+            android:persistent="false"
+            android:title="@string/upperbone">
+
+            <Preference
+                android:key="provider"
+                android:summary="Airtel"
+                android:title="Provider" />
+        </PreferenceScreen>
+
+        <PreferenceScreen
+            android:key="lowerbone"
+            android:persistent="false"
+            android:title="@string/lowerbone">
+
+            <Preference
+                android:key="provider"
+                android:summary="Airtel"
+                android:title="Provider" />
+        </PreferenceScreen>
+
+        <PreferenceScreen
+            android:key="category"
+            android:persistent="false"
+            android:title="@string/lowermuscle">
+
+            <Preference
+                android:key="provider"
+                android:summary="Airtel"
+                android:title="Provider" />
+        </PreferenceScreen>
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

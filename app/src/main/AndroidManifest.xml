@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.leebeomwoo.viewbody_final">
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    //wifi 연결을 확인함
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    //wifi 체인지를 확인함
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    //네트웍이 연결된것을 확인할수 있게함
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    // 인터넷을 사용함
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+    <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
+
+    <uses-feature
+        android:name="android.hardware.camera2.full"
+        android:required="false" />
+    //카메라 사용
+    <uses-feature
+        android:name="android.hardware.camera.full"
+        android:required="false" />
+    //카메라 사용
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera.front"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera.autofocus"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera2"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera2.front"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera2.autofocus"
+        android:required="false" />
+
+    <application
+        android:allowBackup="true"
+        android:hardwareAccelerated="true"
+        android:largeHeap="true"
+        android:icon="@drawable/logo"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/ViewBody">
+        <meta-data
+            android:name="android.webkit.WebView.MetricsOptOut"
+            android:value="true" />
+        <activity
+            android:name=".IntroActivity"
+            android:theme="@style/ViewBody"
+            android:windowSoftInputMode="adjustPan"/>
+        <activity android:name=".MainActivity"
+            android:theme="@style/ViewBody">
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".QnaActivity"
+            android:theme="@style/ViewBody"
+            android:windowSoftInputMode="adjustPan" />
+        <activity
+            android:name=".ItemViewActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:theme="@style/ViewBody" />
+        <activity
+            android:name=".AccountActivity"
+            android:theme="@style/ViewBody"
+            android:windowSoftInputMode="adjustPan" />
+        <activity android:name=".FirstActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter></activity>
+    </application>
+</manifest>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/layou_out_line"
+    android:weightSum="1">
+
+    <TextView
+        android:layout_width="90dp"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName"
+        android:ems="10"
+        android:id="@+id/reply_id"
+        android:textSize="10sp"
+        tools:ignore="HardcodedText,TextViewEdits" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textMultiLine"
+        android:ems="10"
+        android:id="@+id/reply_content"
+        tools:ignore="TextViewEdits"
+        android:textSize="10sp" />
+</LinearLayout>

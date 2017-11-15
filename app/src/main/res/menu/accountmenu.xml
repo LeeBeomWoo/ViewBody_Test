@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".MainList.AccountActivity">
+    <group
+        android:id="@+id/body"
+        android:checkableBehavior="none"
+        android:enabled="false"
+        android:title="@string/bodyinfocategory"
+        android:visible="true"
+        app:showAsAction="ifRoom|collapseActionView">
+        <item
+            android:id="@+id/up_info"
+            android:title="@string/upper_info" />
+        <item
+            android:id="@+id/up_exer"
+            android:title="@string/upper_exer" />
+        <item
+            android:id="@+id/lo_info"
+            android:title="@string/lower_info" />
+        <item
+            android:id="@+id/lo_exer"
+            android:title="@string/lower_exer" />
+        <item
+            android:id="@+id/info_stretching"
+            android:title="@string/stretching" />
+    </group>
+    <group
+        android:id="@+id/follow"
+        android:title="@string/follow"
+        app:showAsAction="ifRoom|collapseActionView">
+        <item
+            android:id="@+id/follow_core"
+            android:title="@string/follow_core" />
+        <item
+            android:id="@+id/follow_breth"
+            android:title="@string/follow_breth" />
+        <item
+            android:id="@+id/follow_muscleup"
+            android:title="@string/follow_muscleup" />
+        <item
+            android:id="@+id/follow_stretching"
+            android:title="@string/follow_stretching" />
+    </group>
+    <group
+        android:id="@+id/food"
+        android:title="@string/foodcategory"
+        app:showAsAction="ifRoom|collapseActionView">
+        <item
+            android:id="@+id/food_fat"
+            android:title="@string/food_fat" />
+        <item
+            android:id="@+id/food_powerup"
+            android:title="@string/food_powerup" />
+        <item
+            android:id="@+id/food_muscleup"
+            android:title="@string/food_muscleup" />
+        <item
+            android:id="@+id/food_diet"
+            android:title="@string/food_diet" />
+        <item
+            android:id="@+id/food_metabolic"
+            android:title="@string/food_metabolic" />
+    </group>
+    <group
+        android:id="@+id/writer"
+        android:title="@string/writer_menu"
+        app:showAsAction="ifRoom|collapseActionView">
+        <item
+            android:id="@+id/trainer"
+            android:title="@string/trainer" />
+        <item
+            android:id="@+id/nutriat"
+            android:title="@string/nutriat" />
+    </group>
+    <item android:id="@+id/out"
+        android:title="@string/join_out"
+        app:showAsAction="never"/>
+    <item android:id="@+id/join"
+        android:title="@string/join"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/information"
+        android:title="@string/user_information"
+        app:showAsAction="never" />
+</menu>

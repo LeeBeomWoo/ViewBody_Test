@@ -1,0 +1,48 @@
+<cn.gavinliu.android.lib.scale.ScaleRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    tools:context="com.example.leebeomwoo.viewbody_final.FollowTab_Sub">
+
+    <!-- TODO: Update blank fragment layout -->
+    <cn.gavinliu.android.lib.scale.ScaleRelativeLayout
+        android:id="@+id/follow_tab"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:background="@color/followsubtabcolor"
+        android:orientation="horizontal"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteY="8dp">
+
+        <com.example.leebeomwoo.viewbody_final.Support.SlidingTabLayout
+            android:id="@+id/follow_TabLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true"
+            android:layout_gravity="center"
+            android:layout_marginBottom="0dp"
+            android:layout_marginLeft="0dp"
+            android:layout_marginRight="0dp"
+            android:layout_marginTop="0dp"
+            android:fillViewport="true"
+            android:textAlignment="center"
+            app:tabTextColor="@color/cardview_light_background"
+            tools:ignore="MissingConstraints" />
+    </cn.gavinliu.android.lib.scale.ScaleRelativeLayout>
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/follow_viewPager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/follow_tab"
+        android:layout_marginBottom="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_weight="1" />
+
+</cn.gavinliu.android.lib.scale.ScaleRelativeLayout>
