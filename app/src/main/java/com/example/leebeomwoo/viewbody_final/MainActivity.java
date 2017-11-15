@@ -64,7 +64,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     DrawerLayout mDrawerLayout;
     SearchView mSearchView;
     MenuItem myActionMenuItem, menu_more;
-    CenteringTabLayout tabLayout;
 
     private static final float PERCENTAGE_TO_SHOW_TITLE_AT_TOOLBAR  = 0.7f;
     private static final float PERCENTAGE_TO_HIDE_TITLE_DETAILS     = 0.4f;
@@ -86,7 +85,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     ScrollView menu_Scroll;
     LinearLayout btn_View, main, top;
     CheckBox checkedTextView;
-    public Drawable selector;
     String[] body, follow, food, trainer, license;
     String title_temp, transition;
     int i = 0;
@@ -139,24 +137,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // Display icon in the toolbar
         // toolbar.inflateMenu(R.menu.menu_main);
         // mSearchView = (SearchView) toolbar.getMenu().findItem(R.id.action_search).getActionView();
-
-        /**back = (ImageButton) findViewById(R.id.tabbackBtn);
-        back.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(context, FirstActivity.class);
-                intent.putExtra("message", 1);
-                startActivity(intent);
-            }
-        });
-        menu = (ImageButton) findViewById(R.id.tabmenuBtn);
-        menu.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                popupDisplay(v);
-            }
-        });
-         */
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         if (navigationView != null) {
             setupDrawerContent(navigationView);
@@ -189,6 +169,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
         viewPager.setCurrentItem(i, true);
+        collapse_space.setOnClickListener(this);
+        toolbar_space.setOnClickListener(this);
     }
     private int imageSet(int f){
         switch (f){
@@ -584,7 +566,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
          * @y : PopupWindow를 (-y, +y) 만큼 상,하 이동된 위치에 생성
          * mPopupWindow.showAtLocation(popupView, Gravity.NO_GRAVITY, 0, 0);
          * */
-         //mPopupWindow.showAtLocation(popupView, Gravity.CENTER, 0, 0);
         /**
          * update() 메서드를 통해 PopupWindow의 좌우 사이즈, x좌표, y좌표
          * anchor View까지 재설정 해줄수 있습니다.
@@ -592,8 +573,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
          */
         mPopupWindow.setFocusable(true);
         mPopupWindow.setOutsideTouchable(true);
+        mPopupWindow.showAtLocation(popupView, Gravity.RIGHT, 0, 0);
         Log.d("popup", "display");
-        mPopupWindow.showAsDropDown(popupView, Gravity.END, 0, 0);
     }
     private void setupDrawerContent(NavigationView navigationView) {
         navigationView.setNavigationItemSelectedListener(
@@ -686,6 +667,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         food = new String[]{"체지방감소", "근력강화", "근육량증대", "몸매관리", "대사증후군"};
         trainer = new String[]{"트레이너", "영양사"};
         license = new String[]{};
+        Intent home = new Intent(MainActivity.this, FirstActivity.class);
         switch (v.getId()) {
             case R.id.cancel_menuBtn:
                 mPopupWindow.dismiss();
@@ -773,10 +755,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 editor.apply();
                 break;
             case R.id.menuBtn_home:
-                Intent home = new Intent(MainActivity.this, FirstActivity.class);
                 startActivity(home);
                 break;
-
+            case R.id.expand_space:
+                startActivity(home);
+                break;
+            case R.id.tool_space:
+                startActivity(home);
+                break;
         }
     }
 

@@ -10,4 +10,5 @@
     android:layout_marginRight="16dp"
     app:layoutManager="LinearLayoutManager"
     tools:context="com.example.leebeomwoo.viewbody_final.Fragment.QnAFragment"
-    tools:listitem="@layout/fragment_qna" />
+    tools:listitem="@layout/fragment_qna"
+    android:background="@android:color/white"/>

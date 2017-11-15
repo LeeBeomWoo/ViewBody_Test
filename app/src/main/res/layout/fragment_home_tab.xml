@@ -3,80 +3,82 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
+    android:background="@color/cardview_light_background"
+    android:fillViewport="false"
     android:orientation="vertical"
-    android:padding="10dp"
-    android:fillViewport="false">
-        <cn.gavinliu.android.lib.scale.ScaleLinearLayout
+    android:padding="10dp">
+
+    <cn.gavinliu.android.lib.scale.ScaleLinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/new_title_lbl"
+            android:layout_width="match_parent"
+            android:layout_height="35dp"
+            android:padding="5dp"
+            android:text="@string/newsorce"
+            android:textAlignment="viewStart"
+            android:textSize="18sp" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/new_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_marginBottom="5dp"
+            android:orientation="horizontal"
+            tools:listitem="@layout/fragment_detail" />
 
-            <TextView
-                android:id="@+id/new_title_lbl"
-                android:layout_width="match_parent"
-                android:layout_height="35dp"
-                android:padding="5dp"
-                android:text="@string/newsorce"
-                android:textAlignment="viewStart"
-                android:textSize="18sp" />
+        <TextView
+            android:id="@+id/popular_title_lbl"
+            android:layout_width="match_parent"
+            android:layout_height="35dp"
+            android:padding="5dp"
+            android:text="@string/popural_sorce"
+            android:textAlignment="viewStart"
+            android:textSize="18sp" />
 
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/new_list"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="5dp"
-                android:orientation="horizontal"
-                tools:listitem="@layout/fragment_detail" />
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/popular_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:orientation="horizontal"
+            tools:listitem="@layout/fragment_detail" />
 
-            <TextView
-                android:id="@+id/popular_title_lbl"
-                android:layout_width="match_parent"
-                android:layout_height="35dp"
-                android:padding="5dp"
-                android:text="@string/popural_sorce"
-                android:textAlignment="viewStart"
-                android:textSize="18sp" />
+        <TextView
+            android:id="@+id/new_writer_lbl"
+            android:layout_width="match_parent"
+            android:layout_height="35dp"
+            android:padding="5dp"
+            android:text="@string/new_writer"
+            android:textAlignment="viewStart"
+            android:textSize="18sp" />
 
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/popular_list"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="5dp"
-                android:orientation="horizontal"
-                tools:listitem="@layout/fragment_detail" />
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/new_writer_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:orientation="horizontal"
+            tools:listitem="@layout/fragment_detail" />
 
-            <TextView
-                android:id="@+id/new_writer_lbl"
-                android:layout_width="match_parent"
-                android:layout_height="35dp"
-                android:padding="5dp"
-                android:text="@string/new_writer"
-                android:textAlignment="viewStart"
-                android:textSize="18sp" />
+        <TextView
+            android:id="@+id/popular_writer_lbl"
+            android:layout_width="match_parent"
+            android:layout_height="35dp"
+            android:padding="5dp"
+            android:text="@string/popular_writer"
+            android:textAlignment="viewStart"
+            android:textSize="18sp" />
 
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/new_writer_list"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="5dp"
-                android:orientation="horizontal"
-                tools:listitem="@layout/fragment_detail" />
-
-            <TextView
-                android:id="@+id/popular_writer_lbl"
-                android:layout_width="match_parent"
-                android:layout_height="35dp"
-                android:padding="5dp"
-                android:text="@string/popular_writer"
-                android:textAlignment="viewStart"
-                android:textSize="18sp" />
-
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/popular_writer_list"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="5dp"
-                android:orientation="horizontal"
-                tools:listitem="@layout/fragment_detail" />
-        </cn.gavinliu.android.lib.scale.ScaleLinearLayout>
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/popular_writer_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:orientation="horizontal"
+            tools:listitem="@layout/fragment_detail" />
+    </cn.gavinliu.android.lib.scale.ScaleLinearLayout>
 </ScrollView>
