@@ -10,7 +10,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.example.leebeomwoo.viewbody_final.Adapter.ListRecyclerViewAdapter;
 import com.example.leebeomwoo.viewbody_final.Item.LikeItem;
@@ -19,7 +18,6 @@ import com.example.leebeomwoo.viewbody_final.R;
 import com.example.leebeomwoo.viewbody_final.Response.ResponseCbd;
 import com.example.leebeomwoo.viewbody_final.Response.ResponseLd;
 import com.example.leebeomwoo.viewbody_final.Support.ConAdapter;
-import com.example.leebeomwoo.viewbody_final.Support.EndlessRecyclerViewScrollListener;
 import com.example.leebeomwoo.viewbody_final.Support.RecyclerviewClickEvent;
 
 import java.util.ArrayList;
@@ -41,7 +39,6 @@ public class Upper_MuscleFragment extends android.support.v4.app.Fragment {
     ListRecyclerViewAdapter bdadapter;
     RecyclerviewClickEvent clickEvent = new RecyclerviewClickEvent();
     String TAG = "Upper_MuscleFragment";
-    EndlessRecyclerViewScrollListener scrollListener;
     Intent intent;
     public Upper_MuscleFragment(){}
 

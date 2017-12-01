@@ -8,12 +8,8 @@
     android:layout_marginBottom="10dp"
     android:orientation="horizontal">
 
-        <cn.gavinliu.android.lib.scale.ScaleLinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/cardview_light_background"
-            android:orientation="horizontal">
     <cn.gavinliu.android.lib.scale.ScaleRelativeLayout
+        android:id="@+id/detail_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/backline"
@@ -38,8 +34,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_toEndOf="@+id/itemtitle_image"
-                android:paddingStart="15dp"
+                android:lineSpacingExtra="12sp"
                 android:paddingEnd="5dp"
+                android:paddingStart="15dp"
+                android:textAlignment="textStart"
                 android:textSize="28sp"
                 android:textStyle="bold" />
         </cn.gavinliu.android.lib.scale.ScaleRelativeLayout>
@@ -151,5 +149,4 @@
 
     </cn.gavinliu.android.lib.scale.ScaleRelativeLayout>
 
-        </cn.gavinliu.android.lib.scale.ScaleLinearLayout>
 </android.support.v7.widget.CardView>

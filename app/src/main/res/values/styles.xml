@@ -65,7 +65,10 @@
         <item name="android:textColorPrimary">@color/viewbody_primary_text</item>
         <item name="android:colorBackground">@color/view_body_background_light</item>
     </style>
-
+    <style name="menuchange" parent="android:Animation">
+        <item name="android:windowEnterAnimation">@anim/menuin</item>
+        <item name="android:windowExitAnimation">@anim/maunout</item>
+    </style>
     <style name="ToolbarTheme" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
         <!-- android:textColorPrimary is the color of the title text in the Toolbar  -->
         <item name="android:textColorPrimary">@android:color/holo_blue_light</item>

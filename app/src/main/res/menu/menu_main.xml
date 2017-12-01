@@ -3,18 +3,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".MainList.MainActivity">
     <item
-        android:id="@+id/action_menu"
-        android:title="@string/more"
-        android:onClick="popupshow"
-        android:icon="@android:drawable/ic_menu_more"
-        android:visible="true"
-        app:showAsAction="ifRoom|collapseActionView" />
-    <item
         android:id="@+id/action_search"
         android:background="@color/nocolor"
         android:icon="@drawable/search"
         android:title="@android:string/search_go"
         android:visible="true"
         app:actionViewClass="android.support.v7.widget.SearchView"
+        app:showAsAction="ifRoom|collapseActionView" />
+    <item
+        android:id="@+id/action_menu"
+        android:icon="@android:drawable/ic_menu_more"
+        android:onClick="popupshow"
+        android:title="@string/more"
+        android:visible="true"
         app:showAsAction="ifRoom|collapseActionView" />
 </menu>

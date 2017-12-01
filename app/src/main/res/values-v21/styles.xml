@@ -14,6 +14,10 @@
         <item name="android:colorBackground">@color/view_body_background_light</item>
         <item name="android:windowContentTransitions">true</item>
     </style>
+    <style name="menuchange" parent="android:Animation">
+        <item name="android:windowEnterAnimation">@anim/maunout</item>
+        <item name="android:windowExitAnimation">@anim/menuin</item>
+    </style>
     <style name="ViewBody" parent="Theme.AppCompat.Light.NoActionBar">>
         <item name="background">@drawable/background</item>
         <item name="colorPrimary">@color/viewbodyappbarcolor_main</item>

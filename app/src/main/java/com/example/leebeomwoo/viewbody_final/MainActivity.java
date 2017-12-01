@@ -1,5 +1,7 @@
 package com.example.leebeomwoo.viewbody_final;
 
+import android.animation.Animator;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -22,6 +24,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -29,8 +32,11 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
 import android.view.animation.TranslateAnimation;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
@@ -58,6 +64,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import cn.gavinliu.android.lib.scale.ScaleLinearLayout;
+import cn.gavinliu.android.lib.scale.ScaleRelativeLayout;
 import cn.gavinliu.android.lib.scale.config.ScaleConfig;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, AppBarLayout.OnOffsetChangedListener {
@@ -408,173 +415,180 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
     public void popupDisplay()
     {
-        View popupView = getLayoutInflater().inflate(R.layout.menu, null);
-        /**
-         * LayoutParams WRAP_CONTENT를 주면 inflate된 View의 사이즈 만큼의
-         * PopupWinidow를 생성한다.
-         *
-         mPopupWindow = new PopupWindow(popupView,
-         RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-         */
-        mPopupWindow = new PopupWindow(popupView,
-                1000, RelativeLayout.LayoutParams.MATCH_PARENT);
-        cancel_menuBtn = popupView.findViewById(R.id.cancel_menuBtn);
-        account_menuBtn = popupView.findViewById(R.id.account_menuBtn);
-        body_menuBtn = popupView.findViewById(R.id.body_menuBtn);
-        follow_menuBtn = popupView.findViewById(R.id.follow_menuBtn);
-        food_menuBtn = popupView.findViewById(R.id.food_menuBtn);
-        qna_menuBtn = popupView.findViewById(R.id.qna_Btn);
-        writer_menuBtn =  popupView.findViewById(R.id.writer_menuBtn);
-        menu_list = popupView.findViewById(R.id.menu_list);
-        menu_Scroll = popupView.findViewById(R.id.menu_Scroll);
-        btn_View = popupView.findViewById(R.id.btn_View);
-        main = popupView.findViewById(R.id.menu_main);
-        top = popupView.findViewById(R.id.menu_top);
-        menuHomeBtn = popupView.findViewById(R.id.menuBtn_home);
-        //licenseBtn = popupView.findViewById(R.id.license_Btn);
-        license_source = popupView.findViewById(R.id.sourceTxt);
-        license_Title = popupView.findViewById(R.id.titleTxt);
-        checkedTextView = popupView.findViewById(R.id.menuchecked);
+        try {
+            View popupView = getLayoutInflater().inflate(R.layout.menu, (ViewGroup) findViewById(R.id.menu_main));
+            /**
+             * LayoutParams WRAP_CONTENT를 주면 inflate된 View의 사이즈 만큼의
+             * PopupWinidow를 생성한다.
+             *
+             mPopupWindow = new PopupWindow(popupView,
+             RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+             */
+            ScaleRelativeLayout.LayoutParams params = new ScaleRelativeLayout.LayoutParams(1000, ScaleRelativeLayout.LayoutParams.MATCH_PARENT);
+            params.setLayoutDirection(ScaleRelativeLayout.LAYOUT_DIRECTION_LTR);
+            popupView.setLayoutParams(params);
+            cancel_menuBtn = popupView.findViewById(R.id.cancel_menuBtn);
+            account_menuBtn = popupView.findViewById(R.id.account_menuBtn);
+            body_menuBtn = popupView.findViewById(R.id.body_menuBtn);
+            follow_menuBtn = popupView.findViewById(R.id.follow_menuBtn);
+            food_menuBtn = popupView.findViewById(R.id.food_menuBtn);
+            qna_menuBtn = popupView.findViewById(R.id.qna_Btn);
+            writer_menuBtn = popupView.findViewById(R.id.writer_menuBtn);
+            menu_list = popupView.findViewById(R.id.menu_list);
+            menu_Scroll = popupView.findViewById(R.id.menu_Scroll);
+            btn_View = popupView.findViewById(R.id.btn_View);
+            main = popupView.findViewById(R.id.menu_main);
+            top = popupView.findViewById(R.id.menu_top);
+            menuHomeBtn = popupView.findViewById(R.id.menuBtn_home);
+            //licenseBtn = popupView.findViewById(R.id.license_Btn);
+            license_source = popupView.findViewById(R.id.sourceTxt);
+            license_Title = popupView.findViewById(R.id.titleTxt);
+            checkedTextView = popupView.findViewById(R.id.menuchecked);
 
-        cancel_menuBtn.setOnClickListener(this);
-        account_menuBtn.setOnClickListener(this);
-        body_menuBtn.setOnClickListener(this);
-        follow_menuBtn.setOnClickListener(this);
-        food_menuBtn.setOnClickListener(this);
-        qna_menuBtn.setOnClickListener(this);
-        writer_menuBtn.setOnClickListener(this);
-       // licenseBtn.setOnClickListener(this);
-        checkedTextView.setOnClickListener(this);
-        SharedPreferences preferencesCompat = getSharedPreferences("a", MODE_PRIVATE);
-        int tutorial = preferencesCompat.getInt("First", 0);
-        if(tutorial == 0){
-            checkedTextView.setChecked(true);
-        } else {
-            checkedTextView.setChecked(false);
-        }
-        menu_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, final View view,
-                                    int position, long id) {
-                final String item = (String) parent.getItemAtPosition(position);
-               switch (item){
-                   case "상체 운동":
-                       bodyTab_sub = new BodyTab_Sub();
-                       bodyTab_sub.setTabitemSelected(0);
-                       mPopupWindow.dismiss();
-                       break;
-                   case "상체 정보":
-                       bodyTab_sub = new BodyTab_Sub();
-                       bodyTab_sub.setTabitemSelected(1);
-                       mPopupWindow.dismiss();
-                       break;
-                   case "하체 운동":
-                       bodyTab_sub = new BodyTab_Sub();
-                       bodyTab_sub.setTabitemSelected(2);
-                       mPopupWindow.dismiss();
-                       break;
-                   case "하체 정보":
-                       bodyTab_sub = new BodyTab_Sub();
-                       bodyTab_sub.setTabitemSelected(3);
-                       mPopupWindow.dismiss();
-                       break;
-                   case "스트레칭":
-                       bodyTab_sub = new BodyTab_Sub();
-                       bodyTab_sub.setTabitemSelected(4);
-                       mPopupWindow.dismiss();
-                       break;
-                   case "코어 운동":
-                       followTab_sub = new FollowTab_Sub();
-                       followTab_sub.setTabitemSelected(0);
-                       mPopupWindow.dismiss();
-                       break;
-                   case "유산소운동":
-                       followTab_sub = new FollowTab_Sub();
-                       followTab_sub.setTabitemSelected(1);
-                       mPopupWindow.dismiss();
-                       break;
-                   case "근력운동":
-                       followTab_sub = new FollowTab_Sub();
-                       followTab_sub.setTabitemSelected(2);
-                       mPopupWindow.dismiss();
-                       break;
-                   case "스트레칭 따라하기":
-                       followTab_sub = new FollowTab_Sub();
-                       followTab_sub.setTabitemSelected(3);
-                       mPopupWindow.dismiss();
-                       break;
-                   case "체지방감소":
-                       foodTab_sub = new FoodTab_Sub();
-                       foodTab_sub.setTabitemSelected(0);
-                       mPopupWindow.dismiss();
-                       break;
-                   case "근력강화":
-                       foodTab_sub = new FoodTab_Sub();
-                       foodTab_sub.setTabitemSelected(1);
-                       mPopupWindow.dismiss();
-                       break;
-                   case "근육량증대":
-                       foodTab_sub = new FoodTab_Sub();
-                       foodTab_sub.setTabitemSelected(2);
-                       mPopupWindow.dismiss();
-                       break;
-                   case "몸매관리":
-                       foodTab_sub = new FoodTab_Sub();
-                       foodTab_sub.setTabitemSelected(3);
-                       mPopupWindow.dismiss();
-                       break;
-                   case "대사증후군":
-                       foodTab_sub = new FoodTab_Sub();
-                       foodTab_sub.setTabitemSelected(4);
-                       mPopupWindow.dismiss();
-                       break;
-                   case "트레이너":
-                       writerTab_sub = new WriterTab_Sub();
-                       writerTab_sub.setTabitemSelected(0);
-                       mPopupWindow.dismiss();
-                       break;
-                   case "영양사":
-                       writerTab_sub = new WriterTab_Sub();
-                       writerTab_sub.setTabitemSelected(1);
-                       mPopupWindow.dismiss();
-                       break;
+            mPopupWindow = new PopupWindow(popupView, 700, ScaleRelativeLayout.LayoutParams.MATCH_PARENT, true);
 
-               }
+            cancel_menuBtn.setOnClickListener(this);
+            account_menuBtn.setOnClickListener(this);
+            body_menuBtn.setOnClickListener(this);
+            follow_menuBtn.setOnClickListener(this);
+            food_menuBtn.setOnClickListener(this);
+            qna_menuBtn.setOnClickListener(this);
+            writer_menuBtn.setOnClickListener(this);
+            // licenseBtn.setOnClickListener(this);
+            checkedTextView.setOnClickListener(this);
+            SharedPreferences preferencesCompat = getSharedPreferences("a", MODE_PRIVATE);
+            int tutorial = preferencesCompat.getInt("First", 0);
+            if (tutorial == 0) {
+                checkedTextView.setChecked(true);
+            } else {
+                checkedTextView.setChecked(false);
             }
+            menu_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, final View view,
+                                        int position, long id) {
+                    final String item = (String) parent.getItemAtPosition(position);
+                    switch (item) {
+                        case "상체 운동":
+                            bodyTab_sub = new BodyTab_Sub();
+                            bodyTab_sub.setTabitemSelected(0);
+                            mPopupWindow.dismiss();
+                            break;
+                        case "상체 정보":
+                            bodyTab_sub = new BodyTab_Sub();
+                            bodyTab_sub.setTabitemSelected(1);
+                            mPopupWindow.dismiss();
+                            break;
+                        case "하체 운동":
+                            bodyTab_sub = new BodyTab_Sub();
+                            bodyTab_sub.setTabitemSelected(2);
+                            mPopupWindow.dismiss();
+                            break;
+                        case "하체 정보":
+                            bodyTab_sub = new BodyTab_Sub();
+                            bodyTab_sub.setTabitemSelected(3);
+                            mPopupWindow.dismiss();
+                            break;
+                        case "스트레칭":
+                            bodyTab_sub = new BodyTab_Sub();
+                            bodyTab_sub.setTabitemSelected(4);
+                            mPopupWindow.dismiss();
+                            break;
+                        case "코어 운동":
+                            followTab_sub = new FollowTab_Sub();
+                            followTab_sub.setTabitemSelected(0);
+                            mPopupWindow.dismiss();
+                            break;
+                        case "유산소운동":
+                            followTab_sub = new FollowTab_Sub();
+                            followTab_sub.setTabitemSelected(1);
+                            mPopupWindow.dismiss();
+                            break;
+                        case "근력운동":
+                            followTab_sub = new FollowTab_Sub();
+                            followTab_sub.setTabitemSelected(2);
+                            mPopupWindow.dismiss();
+                            break;
+                        case "스트레칭 따라하기":
+                            followTab_sub = new FollowTab_Sub();
+                            followTab_sub.setTabitemSelected(3);
+                            mPopupWindow.dismiss();
+                            break;
+                        case "체지방감소":
+                            foodTab_sub = new FoodTab_Sub();
+                            foodTab_sub.setTabitemSelected(0);
+                            mPopupWindow.dismiss();
+                            break;
+                        case "근력강화":
+                            foodTab_sub = new FoodTab_Sub();
+                            foodTab_sub.setTabitemSelected(1);
+                            mPopupWindow.dismiss();
+                            break;
+                        case "근육량증대":
+                            foodTab_sub = new FoodTab_Sub();
+                            foodTab_sub.setTabitemSelected(2);
+                            mPopupWindow.dismiss();
+                            break;
+                        case "몸매관리":
+                            foodTab_sub = new FoodTab_Sub();
+                            foodTab_sub.setTabitemSelected(3);
+                            mPopupWindow.dismiss();
+                            break;
+                        case "대사증후군":
+                            foodTab_sub = new FoodTab_Sub();
+                            foodTab_sub.setTabitemSelected(4);
+                            mPopupWindow.dismiss();
+                            break;
+                        case "트레이너":
+                            writerTab_sub = new WriterTab_Sub();
+                            writerTab_sub.setTabitemSelected(0);
+                            mPopupWindow.dismiss();
+                            break;
+                        case "영양사":
+                            writerTab_sub = new WriterTab_Sub();
+                            writerTab_sub.setTabitemSelected(1);
+                            mPopupWindow.dismiss();
+                            break;
 
-        });
-        /**
-         * @View anchor : anchor View를 기준으로 바로 아래 왼쪽에 표시.
-         * @예외 : 하지만 anchor View가 화면에 가장 하단 View라면 시스템이
-         * 자동으로 위쪽으로 표시되게 한다.
-         * xoff, yoff : anchor View를 기준으로 PopupWindow가 xoff는 x좌표,
-         * yoff는 y좌표 만큼 이동된 위치에 표시되게 한다.
-         * @int xoff : -숫자(화면 왼쪽으로 이동), +숫자(화면 오른쪽으로 이동)
-         * @int yoff : -숫자(화면 위쪽으로 이동), +숫자(화면 아래쪽으로 이동)
-         * achor View 를 덮는 것도 가능.
-         * 화면바깥 좌우, 위아래로 이동 가능. (짤린 상태로 표시됨)
-         * mPopupWindow.showAsDropDown(btn_Popup, 50, 50);
-         */
-            mPopupWindow.setAnimationStyle(-1); // 애니메이션 설정(-1:설정, 0:설정안함)
+                    }
+                }
 
-        /**
-         * showAtLocation(parent, gravity, x, y)
-         * @praent : PopupWindow가 생성될 parent View 지정
-         * View v = (View) findViewById(R.id.btn_click)의 형태로 parent 생성
-         * @gravity : parent View의 Gravity 속성 지정 Popupwindow 위치에 영향을 줌.
-         * @x : PopupWindow를 (-x, +x) 만큼 좌,우 이동된 위치에 생성
-         * @y : PopupWindow를 (-y, +y) 만큼 상,하 이동된 위치에 생성
-         * mPopupWindow.showAtLocation(popupView, Gravity.NO_GRAVITY, 0, 0);
-         * */
-        /**
-         * update() 메서드를 통해 PopupWindow의 좌우 사이즈, x좌표, y좌표
-         * anchor View까지 재설정 해줄수 있습니다.
-         * mPopupWindow.update(anchor, xoff, yoff, width, height)(width, height);
-         */
-        mPopupWindow.setFocusable(true);
-        mPopupWindow.setOutsideTouchable(true);
-        mPopupWindow.showAtLocation(popupView, Gravity.RIGHT, 0, 0);
-        Log.d("popup", "display");
+            });
+            /**
+             * @View anchor : anchor View를 기준으로 바로 아래 왼쪽에 표시.
+             * @예외 : 하지만 anchor View가 화면에 가장 하단 View라면 시스템이
+             * 자동으로 위쪽으로 표시되게 한다.
+             * xoff, yoff : anchor View를 기준으로 PopupWindow가 xoff는 x좌표,
+             * yoff는 y좌표 만큼 이동된 위치에 표시되게 한다.
+             * @int xoff : -숫자(화면 왼쪽으로 이동), +숫자(화면 오른쪽으로 이동)
+             * @int yoff : -숫자(화면 위쪽으로 이동), +숫자(화면 아래쪽으로 이동)
+             * achor View 를 덮는 것도 가능.
+             * 화면바깥 좌우, 위아래로 이동 가능. (짤린 상태로 표시됨)
+             * mPopupWindow.showAsDropDown(btn_Popup, 50, 50);
+             */
+            mPopupWindow.setAnimationStyle(R.style.menuchange); // 애니메이션 설정(-1:설정, 0:설정안함)
+
+            /**
+             * showAtLocation(parent, gravity, x, y)
+             * @praent : PopupWindow가 생성될 parent View 지정
+             * View v = (View) findViewById(R.id.btn_click)의 형태로 parent 생성
+             * @gravity : parent View의 Gravity 속성 지정 Popupwindow 위치에 영향을 줌.
+             * @x : PopupWindow를 (-x, +x) 만큼 좌,우 이동된 위치에 생성
+             * @y : PopupWindow를 (-y, +y) 만큼 상,하 이동된 위치에 생성
+             * mPopupWindow.showAtLocation(popupView, Gravity.NO_GRAVITY, 0, 0);
+             * */
+            /**
+             * update() 메서드를 통해 PopupWindow의 좌우 사이즈, x좌표, y좌표
+             * anchor View까지 재설정 해줄수 있습니다.
+             * mPopupWindow.update(anchor, xoff, yoff, width, height)(width, height);
+             */
+            mPopupWindow.setFocusable(true);
+            mPopupWindow.setOutsideTouchable(true);
+            mPopupWindow.showAtLocation(popupView, Gravity.END, 0, 0);
+            Log.d("popup", "display");
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
     private void setupDrawerContent(NavigationView navigationView) {
         navigationView.setNavigationItemSelectedListener(
@@ -768,6 +782,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void popupshow(MenuItem item) {
         popupDisplay();
+        Log.d("MenuItemClick", String.valueOf(item.getItemId()));
     }
 }
 /** 상체 : 1, 하체 : 2

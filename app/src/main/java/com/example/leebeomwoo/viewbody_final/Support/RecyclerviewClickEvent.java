@@ -3,13 +3,19 @@ package com.example.leebeomwoo.viewbody_final.Support;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Matrix;
+import android.graphics.Point;
 import android.graphics.PointF;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.v7.widget.CardView;
+import android.text.Layout;
+import android.util.DisplayMetrics;
 import android.util.FloatMath;
 import android.util.Log;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -26,6 +32,8 @@ import com.example.leebeomwoo.viewbody_final.Item.ListDummyItem;
 import com.example.leebeomwoo.viewbody_final.R;
 import com.squareup.picasso.Picasso;
 
+import java.util.Objects;
+
 import cn.gavinliu.android.lib.scale.ScaleRelativeLayout;
 
 /**
@@ -35,11 +43,16 @@ import cn.gavinliu.android.lib.scale.ScaleRelativeLayout;
 public class RecyclerviewClickEvent implements View.OnTouchListener {
     private static final String TAG = "Popup";
     private Context context;
-    private Drawable drawable ;
-    private ImageView imgViewIcon;
+    private int drawable ;
+    private ImageView imgViewIcon, titleimage;
+    private TextView video_title_1, video_title_2, video_title_3, txtViewTitle, txtViewId;
+    private WebView imgViewFace, videoView_1, videoView_2, videoView_3;
     private ListDummyItem ldItem;
+    ScaleRelativeLayout main;
+    private CardView card;
     boolean end;
 
+    private int color, rusult, result, fin;
     // These matrices will be used to move and zoom image
     Matrix matrix = new Matrix();
     Matrix savedMatrix = new Matrix();
@@ -49,12 +62,18 @@ public class RecyclerviewClickEvent implements View.OnTouchListener {
     static final int DRAG = 1;
     static final int ZOOM = 2;
     int mode = NONE;
+    private float dx; // postTranslate X distance
+    private float dy; // postTranslate Y distance
+    private float[] matrixValues = new float[9];
+    float matrixX = 0; // X coordinate of matrix inside the ImageView
+    float matrixY = 0; // Y coordinate of matrix inside the ImageView
+    float width = 0; // width of drawable
+    float height = 0; // height of drawable
 
     // Remember some things for zooming
     PointF start = new PointF();
     PointF mid = new PointF();
     float oldDist = 1f;
-    String savedItemClicked;
 
     private final static String FURL = "<html><body><iframe width=\"1080\" height=\"720\" src=\"";
     private final static String BURL = "\" frameborder=\"0\" allowfullscreen></iframe></html></body>";
@@ -63,33 +82,40 @@ public class RecyclerviewClickEvent implements View.OnTouchListener {
     public void Click(ListDummyItem ld_Item, Context context){
         this.context = context;
         ldItem = ld_Item;
+        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        DisplayMetrics metrics = new DisplayMetrics();
+        if (wm != null) {
+            wm.getDefaultDisplay().getMetrics(metrics);
+        }
         //read your lovely variable
         Log.d(TAG, ldItem.getLd_ImageUrl());
         Dialog dialog = new Dialog(context);
         dialog.setContentView(R.layout.fragment_detail);
         ScrollView scroll = new ScrollView(context);
-        dialog.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
-        ScaleRelativeLayout main = dialog.findViewById(R.id.detail_layout);
-        TextView txtViewTitle = (TextView) dialog.findViewById(R.id.detile_Title);
+        dialog.getWindow().setLayout(metrics.widthPixels, metrics.heightPixels);
+        //dialog.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+        main = dialog.findViewById(R.id.detail_layout);
+        txtViewTitle = dialog.findViewById(R.id.detile_Title);
         scroll.setLayoutParams(new WindowManager.LayoutParams(WindowManager.LayoutParams.MATCH_PARENT,
                 WindowManager.LayoutParams.MATCH_PARENT));
-        CardView card = dialog.findViewById(R.id.cardView);
-        imgViewIcon = (ImageView) dialog.findViewById(R.id.detile_Image);
-        TextView video_title_1 = (TextView) dialog.findViewById(R.id.video_title_1);
-        TextView video_title_2 = (TextView) dialog.findViewById(R.id.video_title_2);
-        TextView video_title_3 = (TextView) dialog.findViewById(R.id.video_title_3);
-        WebView imgViewFace = (WebView) dialog.findViewById(R.id.detile_face);
-        WebView videoView_1 = (WebView) dialog.findViewById(R.id.video_view_1);
-        WebView videoView_2 = (WebView) dialog.findViewById(R.id.video_view_2);
-        TextView txtViewId = (TextView) dialog.findViewById(R.id.detile_Id);
-        Button button = (Button) dialog.findViewById(R.id.like_btn);
-        WebView videoView_3 = (WebView) dialog.findViewById(R.id.video_view_3);
-        ImageView titleimage = (ImageView) dialog.findViewById(R.id.itemtitle_image);
+        card = dialog.findViewById(R.id.cardView);
         ViewGroup viewGroup = ((ViewGroup)card.getParent());
         viewGroup.removeView(card);
         scroll.addView(card);
         viewGroup.addView(scroll);
-        titleimage.setImageDrawable(titlecategory(ldItem.getLd_Category()));
+        imgViewIcon = dialog.findViewById(R.id.detile_Image);
+        video_title_1 = dialog.findViewById(R.id.video_title_1);
+        video_title_2 = dialog.findViewById(R.id.video_title_2);
+        video_title_3 = dialog.findViewById(R.id.video_title_3);
+        imgViewFace = dialog.findViewById(R.id.detile_face);
+        videoView_1 = dialog.findViewById(R.id.video_view_1);
+        videoView_2 = dialog.findViewById(R.id.video_view_2);
+        txtViewId = dialog.findViewById(R.id.detile_Id);
+        Button button = dialog.findViewById(R.id.like_btn);
+        videoView_3 = dialog.findViewById(R.id.video_view_3);
+        titleimage = dialog.findViewById(R.id.itemtitle_image);
+        Picasso.with(context).load(titlecategory(ldItem.getLd_Category())).fit().into(titleimage);
+        //titleimage.setImageDrawable(titlecategory(ldItem.getLd_Category()));
         String result = ldItem.getLd_ImageUrl().replaceAll("\\/","/");
         Picasso.with(context).load(ConAdapter.SERVER_URL + result).into(imgViewIcon);
         txtViewTitle.setText(ldItem.getLd_Title());
@@ -128,7 +154,7 @@ public class RecyclerviewClickEvent implements View.OnTouchListener {
                     video_title_3.setText(animalsArray[4]);
                     webviewSet(videoView_1, animalsArray[1]);
                     webviewSet(videoView_2, animalsArray[3]);
-                    webviewSet(videoView_2, animalsArray[5]);
+                    webviewSet(videoView_3, animalsArray[5]);
                     break;
             }
 
@@ -158,99 +184,552 @@ public class RecyclerviewClickEvent implements View.OnTouchListener {
             webview.loadData(URL3, "text/html", "utf-8");
         }
     }
-    private Drawable titlecategory(int i){
-        switch (i){
-            case 31://근육
-                drawable = context.getResources().getDrawable(R.drawable.muscleup_body);
-                break;
-            case 32://골격
-                drawable = context.getResources().getDrawable(R.drawable.bone);
-                break;
-            case 33://근지구력
-                drawable = context.getResources().getDrawable(R.drawable.muscletime);
-                break;
-            case 34://근파워
-                drawable = context.getResources().getDrawable(R.drawable.musclepower);
-                break;
-            case 35://머슬업
-                drawable = context.getResources().getDrawable(R.drawable.muscleup_body);
-                break;
-            case 42://허리
-                drawable = context.getResources().getDrawable(R.drawable.spine);
-                break;
-            case 11://전면상완
-                drawable = context.getResources().getDrawable(R.drawable.front_upper_arm);
-                break;
-            case 21://후면상완
-                drawable = context.getResources().getDrawable(R.drawable.back_upper_arm);
-                break;
-            case 12://전면하완
-                drawable = context.getResources().getDrawable(R.drawable.front_lower_arm);
-                break;
-            case 22://후면하완
-                drawable = context.getResources().getDrawable(R.drawable.back_lower_arm);
-                break;
-            case 37://복부
-                drawable = context.getResources().getDrawable(R.drawable.stormach);
-                break;
-            case 38://가슴
-                drawable = context.getResources().getDrawable(R.drawable.burst);
-                break;
-            case 13://전면어깨
-                drawable = context.getResources().getDrawable(R.drawable.front_shoulder);
-                break;
-            case 23://후면어깨
-                drawable = context.getResources().getDrawable(R.drawable.back_shoulder);
-                break;
-            case 14://전면목
-                drawable = context.getResources().getDrawable(R.drawable.front_neck);
-                break;
-            case 24://후면목
-                drawable = context.getResources().getDrawable(R.drawable.back_neck);
-                break;
-            case 15://전면허벅지
-                drawable = context.getResources().getDrawable(R.drawable.front_upper_leg);
-                break;
-            case 25://후면허벅지
-                drawable = context.getResources().getDrawable(R.drawable.back_upper_leg);
-                break;
-            case 16://전면종아리
-                drawable = context.getResources().getDrawable(R.drawable.front_lower_leg);
-                break;
-            case 26://후면종아리
-                drawable = context.getResources().getDrawable(R.drawable.back_lower_leg);
-                break;
-            case 36://엉덩이
-                drawable = context.getResources().getDrawable(R.drawable.hip);
-                break;
-            case 39://상체
-                drawable = context.getResources().getDrawable(R.drawable.upper);
-                break;
-            case 40://하체
-                drawable = context.getResources().getDrawable(R.drawable.lower);
-                break;
-            case 17://전면몸통
-                drawable = context.getResources().getDrawable(R.drawable.stormach);
-                break;
-            case 27://후면몸통
-                drawable = context.getResources().getDrawable(R.drawable.back_body);
-                break;
-            case 41://심폐지구력
-                drawable = context.getResources().getDrawable(R.drawable.cardiopulmonary_endurance);
-                break;
-            case 19://미정
-                drawable = context.getResources().getDrawable(R.drawable.foodlogo);
-                break;
+    private int titlecategory(int i){
+        String s =String.valueOf(i);
+        Log.d("카테고리 분류표", s);
+        String[] sa = s.split("");
+        Log.d("카테고리0", sa[1]);
+        Log.d("카테고리1", sa[2]);
+        Log.d("카테고리2", sa[3]);
+        Log.d("카테고리3", sa[4]);
+        if(Objects.equals(sa[1], "1")){//상체
+            if(Objects.equals(sa[2], "0")){//전후면 상관없음
+                switch (sa[3]) {
+                    case "0": // 상관없음
+                        result = R.drawable.upper;
+                        break;
+                    case "1": // 골격
+                        switch (sa[4]) {
+                            case "0": // 상관없음
+                                rusult = R.drawable.upper;
+                                break;
+                            case "1": // 상완
+                                rusult = R.drawable.front_upper_arm;
+                                break;
+                            case "2": // 하완
+                                rusult = R.drawable.front_lower_arm;
+                                break;
+                            case "3": // 어깨
+                                rusult = R.drawable.front_shoulder;
+                                break;
+                            case "4": // 목
+                                rusult = R.drawable.front_neck;
+                                break;
+                            case "5": // 허벅지
+                                rusult = R.drawable.front_upper_leg;
+                                break;
+                            case "6": // 종아리
+                                rusult = R.drawable.front_lower_leg;
+                                break;
+                            case "7": // 가슴
+                                rusult = R.drawable.burst;
+                                break;
+                            case "8": // 엉덩이
+                                rusult = R.drawable.hip;
+                                break;
+                            case "9": // 복부
+                                rusult = R.drawable.stormach;
+                                break;
+                        }
+                        result = rusult;
+                        break;
+                    case "2": // 근육
+                        switch (sa[4]) {
+                            case "0": // 상관없음
+                                rusult = R.drawable.upper;
+                                break;
+                            case "1": // 상완
+                                rusult = R.drawable.front_upper_arm;
+                                break;
+                            case "2": // 하완
+                                rusult = R.drawable.front_lower_arm;
+                                break;
+                            case "3": // 어깨
+                                rusult = R.drawable.front_shoulder;
+                                break;
+                            case "4": // 목
+                                rusult = R.drawable.front_neck;
+                                break;
+                            case "5": // 허벅지
+                                rusult = R.drawable.front_upper_leg;
+                                break;
+                            case "6": // 종아리
+                                rusult = R.drawable.front_lower_leg;
+                                break;
+                            case "7": // 가슴
+                                rusult = R.drawable.burst;
+                                break;
+                            case "8": // 엉덩이
+                                rusult = R.drawable.hip;
+                                break;
+                            case "9": // 복부
+                                rusult = R.drawable.stormach;
+                                break;
+                        }
+                        result = rusult;
+                        break;
+                }
+                fin = result;
+            }else if(Objects.equals(sa[2], "1")){ // 전면
+                switch (sa[3]) {
+                    case "0": // 상관없음
+                        result = R.drawable.upper;
+                        break;
+                    case "1": // 골격
+                        switch (sa[4]) {
+                            case "0": // 상관없음
+                                rusult = R.drawable.upper;
+                                break;
+                            case "1": // 상완
+                                rusult = R.drawable.front_upper_arm;
+                                break;
+                            case "2": // 하완
+                                rusult = R.drawable.front_lower_arm;
+                                break;
+                            case "3": // 어깨
+                                rusult = R.drawable.front_shoulder;
+                                break;
+                            case "4": // 목
+                                rusult = R.drawable.front_neck;
+                                break;
+                            case "5": // 허벅지
+                                rusult = R.drawable.front_upper_leg;
+                                break;
+                            case "6": // 종아리
+                                rusult = R.drawable.front_lower_leg;
+                                break;
+                            case "7": // 가슴
+                                rusult = R.drawable.burst;
+                                break;
+                            case "8": // 엉덩이
+                                rusult = R.drawable.hip;
+                                break;
+                            case "9": // 복부
+                                rusult = R.drawable.stormach;
+                                break;
+                        }
+                        result = rusult;
+                        break;
+                    case "2": // 근육
+                        switch (sa[4]) {
+                            case "0": // 상관없음
+                                rusult = R.drawable.upper;
+                                break;
+                            case "1": // 상완
+                                rusult = R.drawable.front_upper_arm;
+                                break;
+                            case "2": // 하완
+                                rusult = R.drawable.front_lower_arm;
+                                break;
+                            case "3": // 어깨
+                                rusult = R.drawable.front_shoulder;
+                                break;
+                            case "4": // 목
+                                rusult = R.drawable.front_neck;
+                                break;
+                            case "5": // 허벅지
+                                rusult = R.drawable.front_upper_leg;
+                                break;
+                            case "6": // 종아리
+                                rusult = R.drawable.front_lower_leg;
+                                break;
+                            case "7": // 가슴
+                                rusult = R.drawable.burst;
+                                break;
+                            case "8": // 엉덩이
+                                rusult = R.drawable.hip;
+                                break;
+                            case "9": // 복부
+                                rusult = R.drawable.stormach;
+                                break;
+                        }
+                        result = rusult;
+                        break;
+                    case "3": // 근력
+                        result = R.drawable.muscleup;
+                        break;
+                    case "4": // 근지구력
+                        result = R.drawable.musclelong;
+                        break;
+                    case "5": // 근파워
+                        result = R.drawable.musclepower;
+                        break;
+                    case "6": // 심폐지구력
+                        result = R.drawable.cardiopulmonary_endurance;
+                        break;
+                    case "7": // 유연성
+                        result = R.drawable.stretching;
+                        break;
+                }
+                fin = result;
+            }else if(Objects.equals(sa[2], "2")) { // 후면
+                switch (sa[3]) {
+                    case "0": // 상관없음
+                        result = R.drawable.upper;
+                        break;
+                    case "1": // 골격
+                        switch (sa[4]) {
+                            case "0": // 상관없음
+                                rusult = R.drawable.upper;
+                                break;
+                            case "1": // 상완
+                                rusult = R.drawable.back_upper_arm;
+                                break;
+                            case "2": // 하완
+                                rusult = R.drawable.back_lower_arm;
+                                break;
+                            case "3": // 어깨
+                                rusult = R.drawable.back_shoulder;
+                                break;
+                            case "4": // 목
+                                rusult = R.drawable.back_neck;
+                                break;
+                            case "5": // 허벅지
+                                rusult = R.drawable.back_upper_leg;
+                                break;
+                            case "6": // 종아리
+                                rusult = R.drawable.back_lower_leg;
+                                break;
+                            case "7": // 가슴
+                                rusult = R.drawable.back_body;
+                                break;
+                            case "8": // 엉덩이
+                                rusult = R.drawable.hip;
+                                break;
+                            case "9": // 복부
+                                rusult = R.drawable.back_body;
+                                break;
+                        }
+                        result = rusult;
+                        break;
+                    case "2": // 근육
+                        switch (sa[4]) {
+                            case "0": // 상관없음
+                                rusult = R.drawable.upper;
+                                break;
+                            case "1": // 상완
+                                rusult = R.drawable.back_upper_arm;
+                                break;
+                            case "2": // 하완
+                                rusult = R.drawable.back_lower_arm;
+                                break;
+                            case "3": // 어깨
+                                rusult = R.drawable.back_shoulder;
+                                break;
+                            case "4": // 목
+                                rusult = R.drawable.back_neck;
+                                break;
+                            case "5": // 허벅지
+                                rusult = R.drawable.back_upper_leg;
+                                break;
+                            case "6": // 종아리
+                                rusult = R.drawable.back_lower_leg;
+                                break;
+                            case "7": // 가슴
+                                rusult = R.drawable.back_body;
+                                break;
+                            case "8": // 엉덩이
+                                rusult = R.drawable.hip;
+                                break;
+                            case "9": // 복부
+                                rusult = R.drawable.back_body;
+                                break;
+                        }
+                        result =rusult;
+                        Log.d("drawble rusult", String.valueOf(rusult));
+                        break;
+                    case "3": // 근력
+                        result = R.drawable.muscleup;
+                        break;
+                    case "4": // 근지구력
+                        result = R.drawable.musclelong;
+                        break;
+                    case "5": // 근파워
+                        result = R.drawable.musclepower;
+                        break;
+                    case "6": // 심폐지구력
+                        result = R.drawable.cardiopulmonary_endurance;
+                        break;
+                    case "7": // 유연성
+                        result = R.drawable.stretching;
+                        break;
+                }
+                fin = result;
+                Log.d("drawble rusult", String.valueOf(rusult));
+                Log.d("drawble result", String.valueOf(result));
+                Log.d("drawble fin",String.valueOf(fin));
+            }
+        }else {//하체
+            if(Objects.equals(sa[2], "0")){//전후면 상관없음
+                switch (sa[3]) {
+                    case "0": // 상관없음
+                        result = R.drawable.lower;
+                        break;
+                    case "1": // 골격
+                        switch (sa[4]) {
+                            case "0": // 상관없음
+                                rusult = R.drawable.lower;
+                                break;
+                            case "1": // 상완
+                                rusult = R.drawable.front_upper_arm;
+                                break;
+                            case "2": // 하완
+                                rusult = R.drawable.front_lower_arm;
+                                break;
+                            case "3": // 어깨
+                                rusult = R.drawable.front_shoulder;
+                                break;
+                            case "4": // 목
+                                rusult = R.drawable.front_neck;
+                                break;
+                            case "5": // 허벅지
+                                rusult = R.drawable.front_upper_leg;
+                                break;
+                            case "6": // 종아리
+                                rusult = R.drawable.front_lower_leg;
+                                break;
+                            case "7": // 가슴
+                                rusult = R.drawable.burst;
+                                break;
+                            case "8": // 엉덩이
+                                rusult = R.drawable.hip;
+                                break;
+                            case "9": // 복부
+                                rusult = R.drawable.stormach;
+                                break;
+                        }
+                        result = rusult;
+                        break;
+                    case "2": // 근육
+                        switch (sa[4]) {
+                            case "0": // 상관없음
+                                rusult = R.drawable.lower;
+                                break;
+                            case "1": // 상완
+                                rusult = R.drawable.front_upper_arm;
+                                break;
+                            case "2": // 하완
+                                rusult = R.drawable.front_lower_arm;
+                                break;
+                            case "3": // 어깨
+                                rusult = R.drawable.front_shoulder;
+                                break;
+                            case "4": // 목
+                                rusult = R.drawable.front_neck;
+                                break;
+                            case "5": // 허벅지
+                                rusult = R.drawable.front_upper_leg;
+                                break;
+                            case "6": // 종아리
+                                rusult = R.drawable.front_lower_leg;
+                                break;
+                            case "7": // 가슴
+                                rusult = R.drawable.burst;
+                                break;
+                            case "8": // 엉덩이
+                                rusult = R.drawable.hip;
+                                break;
+                            case "9": // 복부
+                                rusult = R.drawable.stormach;
+                                break;
+                        }
+                        result = rusult;
+                        break;
+                }
+                fin = result;
+            }else if(Objects.equals(sa[2], "1")){ // 전면
+                switch (sa[3]) {
+                    case "0": // 상관없음
+                        result = R.drawable.lower;
+                        break;
+                    case "1": // 골격
+                        switch (sa[4]) {
+                            case "0": // 상관없음
+                                rusult = R.drawable.lower;
+                                break;
+                            case "1": // 상완
+                                rusult = R.drawable.front_upper_arm;
+                                break;
+                            case "2": // 하완
+                                rusult = R.drawable.front_lower_arm;
+                                break;
+                            case "3": // 어깨
+                                rusult = R.drawable.front_shoulder;
+                                break;
+                            case "4": // 목
+                                rusult = R.drawable.front_neck;
+                                break;
+                            case "5": // 허벅지
+                                rusult = R.drawable.front_upper_leg;
+                                break;
+                            case "6": // 종아리
+                                rusult = R.drawable.front_lower_leg;
+                                break;
+                            case "7": // 가슴
+                                rusult = R.drawable.burst;
+                                break;
+                            case "8": // 엉덩이
+                                rusult = R.drawable.hip;
+                                break;
+                            case "9": // 복부
+                                rusult = R.drawable.stormach;
+                                break;
+                        }
+                        result = rusult;
+                        break;
+                    case "2": // 근육
+                        switch (sa[4]) {
+                            case "0": // 상관없음
+                                rusult = R.drawable.lower;
+                                break;
+                            case "1": // 상완
+                                rusult = R.drawable.front_upper_arm;
+                                break;
+                            case "2": // 하완
+                                rusult = R.drawable.front_lower_arm;
+                                break;
+                            case "3": // 어깨
+                                rusult = R.drawable.front_shoulder;
+                                break;
+                            case "4": // 목
+                                rusult = R.drawable.front_neck;
+                                break;
+                            case "5": // 허벅지
+                                rusult = R.drawable.front_upper_leg;
+                                break;
+                            case "6": // 종아리
+                                rusult = R.drawable.front_lower_leg;
+                                break;
+                            case "7": // 가슴
+                                rusult = R.drawable.burst;
+                                break;
+                            case "8": // 엉덩이
+                                rusult = R.drawable.hip;
+                                break;
+                            case "9": // 복부
+                                rusult = R.drawable.stormach;
+                                break;
+                        }
+                        result = rusult;
+                        break;
+                    case "3": // 근력
+                        result = R.drawable.muscleup;
+                        break;
+                    case "4": // 근지구력
+                        result = R.drawable.musclelong;
+                        break;
+                    case "5": // 근파워
+                        result = R.drawable.musclepower;
+                        break;
+                    case "6": // 심폐지구력
+                        result = R.drawable.cardiopulmonary_endurance;
+                        break;
+                    case "7": // 유연성
+                        result = R.drawable.stretching;
+                        break;
+                }
+                fin = result;
+            }else if(Objects.equals(sa[2], "2")){ // 후면
+                switch (sa[3]) {
+                    case "0": // 상관없음
+                        result = R.drawable.upbar;
+                        break;
+                    case "1": // 골격
+                        switch (sa[4]) {
+                            case "0": // 상관없음
+                                rusult = R.drawable.upper;
+                                break;
+                            case "1": // 상완
+                                rusult = R.drawable.back_upper_arm;
+                                break;
+                            case "2": // 하완
+                                rusult = R.drawable.back_lower_arm;
+                                break;
+                            case "3": // 어깨
+                                rusult = R.drawable.back_shoulder;
+                                break;
+                            case "4": // 목
+                                rusult = R.drawable.back_neck;
+                                break;
+                            case "5": // 허벅지
+                                rusult = R.drawable.back_upper_leg;
+                                break;
+                            case "6": // 종아리
+                                rusult = R.drawable.back_lower_leg;
+                                break;
+                            case "7": // 가슴
+                                rusult = R.drawable.back_body;
+                                break;
+                            case "8": // 엉덩이
+                                rusult = R.drawable.hip;
+                                break;
+                            case "9": // 복부
+                                rusult = R.drawable.back_body;
+                                break;
+                        }
+                        result = rusult;
+                        break;
+                    case "2": // 근육
+                        switch (sa[4]) {
+                            case "0": // 상관없음
+                                rusult = R.drawable.upper;
+                                break;
+                            case "1": // 상완
+                                rusult = R.drawable.back_upper_arm;
+                                break;
+                            case "2": // 하완
+                                rusult = R.drawable.back_lower_arm;
+                                break;
+                            case "3": // 어깨
+                                rusult = R.drawable.back_shoulder;
+                                break;
+                            case "4": // 목
+                                rusult = R.drawable.back_neck;
+                                break;
+                            case "5": // 허벅지
+                                rusult = R.drawable.back_upper_leg;
+                                break;
+                            case "6": // 종아리
+                                rusult = R.drawable.back_lower_leg;
+                                break;
+                            case "7": // 가슴
+                                rusult = R.drawable.back_body;
+                                break;
+                            case "8": // 엉덩이
+                                rusult = R.drawable.hip;
+                                break;
+                            case "9": // 복부
+                                rusult = R.drawable.back_body;
+                                break;
+                        }
+                        result = rusult;
+                        break;
+                    case "3": // 근력
+                        result = R.drawable.muscleup;
+                        break;
+                    case "4": // 근지구력
+                        result = R.drawable.musclelong;
+                        break;
+                    case "5": // 근파워
+                        result = R.drawable.musclepower;
+                        break;
+                    case "6": // 심폐지구력
+                        result = R.drawable.cardiopulmonary_endurance;
+                        break;
+                    case "7": // 유연성
+                        result = R.drawable.stretching;
+                        break;
+                }
+                fin = result;
+            }
         }
-        return drawable;
+        return fin;
     }
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-
         ImageView view = (ImageView) v;
         dumpEvent(event);
-
         // Handle touch events here...
         switch (event.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
@@ -278,8 +757,37 @@ public class RecyclerviewClickEvent implements View.OnTouchListener {
                 if (mode == DRAG) {
                     // ...
                     matrix.set(savedMatrix);
-                    matrix.postTranslate(event.getX() - start.x, event.getY()
-                            - start.y);
+                    matrix.getValues(matrixValues);
+                    matrixX = matrixValues[2];
+                    matrixY = matrixValues[5];
+                    width = matrixValues[0] * ((view).getDrawable()
+                            .getIntrinsicWidth());
+                    height = matrixValues[4] * ((view).getDrawable()
+                            .getIntrinsicHeight());
+
+                    dx = event.getX() - start.x;
+                    dy = event.getY() - start.y;
+/**
+                    //if image will go outside left bound
+                    if (matrixX + dx < 0){
+                        dx = -matrixX;
+                        Log.d("left bound", String.valueOf(matrixX + dx));
+                    }
+                    //if image will go outside right bound
+                    if(matrixX + dx + width > view.getWidth()){
+                        dx = view.getWidth() - matrixX - width;
+                        Log.d("right bound", String.valueOf(matrixX + dx+ width));
+                    }
+                    //if image will go oustside top bound
+                    if (matrixY + dy < 0){
+                        dy = -matrixY;
+                        Log.d("top bound", String.valueOf(matrixX + dx+ width));
+                    }
+                    //if image will go outside bottom bound
+                    if(matrixY + dy + height > view.getHeight()){
+                        dy = view.getHeight() - matrixY - height;
+                    }*/
+                    matrix.postTranslate(dx, dy);
                 } else if (mode == ZOOM) {
                     float newDist = spacing(event);
                     Log.d(TAG, "newDist=" + newDist);
@@ -291,6 +799,9 @@ public class RecyclerviewClickEvent implements View.OnTouchListener {
                 }
                 break;
         }
+        ScaleRelativeLayout.LayoutParams layout = new ScaleRelativeLayout.LayoutParams(ScaleRelativeLayout.LayoutParams.WRAP_CONTENT, ScaleRelativeLayout.LayoutParams.WRAP_CONTENT);
+        layout.addRule(ScaleRelativeLayout.BELOW, R.id.title_layout);
+        view.setLayoutParams(layout);
         view.setImageMatrix(matrix);
         return true;
     }

@@ -17,14 +17,12 @@
             android:id="@+id/title_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/cardview_light_background"
-            android:orientation="horizontal">
+            android:background="@color/cardview_light_background">
 
             <ImageView
                 android:id="@+id/itemtitle_image"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                android:layout_weight="1"
                 tools:ignore="ContentDescription" />
 
             <TextView
@@ -32,8 +30,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_toEndOf="@+id/itemtitle_image"
-                android:paddingStart="15dp"
-                android:paddingEnd="5dp"
+                android:lineSpacingExtra="12sp"
+                android:textAlignment="textStart"
                 android:textSize="27sp"
                 android:textStyle="bold" />
         </cn.gavinliu.android.lib.scale.ScaleRelativeLayout>
@@ -44,7 +42,6 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/title_layout"
             android:layout_gravity="center"
-            android:scaleType="fitStart"
             tools:ignore="ContentDescription" />
 
 
