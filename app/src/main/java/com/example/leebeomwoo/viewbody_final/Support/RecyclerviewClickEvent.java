@@ -767,24 +767,25 @@ public class RecyclerviewClickEvent implements View.OnTouchListener {
 
                     dx = event.getX() - start.x;
                     dy = event.getY() - start.y;
-/**
+
                     //if image will go outside left bound
-                    if (matrixX + dx < 0){
-                        dx = -matrixX;
+                    if (matrixX + dx > 0){
                         Log.d("left bound", String.valueOf(matrixX + dx));
+                        dx = -matrixX;
                     }
                     //if image will go outside right bound
-                    if(matrixX + dx + width > view.getWidth()){
+                    if(matrixX + dx + width < view.getWidth()){
+                        Log.d("right bound", String.valueOf(matrixX + dx+ width)+ "*" + String.valueOf(view.getWidth()));
                         dx = view.getWidth() - matrixX - width;
-                        Log.d("right bound", String.valueOf(matrixX + dx+ width));
-                    }
+                    }/**
                     //if image will go oustside top bound
                     if (matrixY + dy < 0){
+                        Log.d("top bound", String.valueOf(matrixY + dy));
                         dy = -matrixY;
-                        Log.d("top bound", String.valueOf(matrixX + dx+ width));
                     }
                     //if image will go outside bottom bound
                     if(matrixY + dy + height > view.getHeight()){
+                        Log.d("bottom bound", String.valueOf(matrixY + dy+ width) + "*" + String.valueOf(view.getHeight()));
                         dy = view.getHeight() - matrixY - height;
                     }*/
                     matrix.postTranslate(dx, dy);
