@@ -10,12 +10,14 @@ import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.os.SystemClock;
 import android.support.v7.widget.CardView;
 import android.text.Layout;
 import android.util.DisplayMetrics;
 import android.util.FloatMath;
 import android.util.Log;
 import android.view.Display;
+import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -27,6 +29,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.leebeomwoo.viewbody_final.Item.ListDummyItem;
 import com.example.leebeomwoo.viewbody_final.R;
@@ -40,7 +43,7 @@ import cn.gavinliu.android.lib.scale.ScaleRelativeLayout;
  * Created by LeeBeomWoo on 2017-06-21.
  */
 
-public class RecyclerviewClickEvent implements View.OnTouchListener {
+public class RecyclerviewClickEvent extends GestureDetector.SimpleOnGestureListener implements View.OnTouchListener {
     private static final String TAG = "Popup";
     private Context context;
     private int drawable ;
@@ -50,7 +53,7 @@ public class RecyclerviewClickEvent implements View.OnTouchListener {
     private ListDummyItem ldItem;
     ScaleRelativeLayout main;
     private CardView card;
-    boolean end;
+    boolean expanded = false;
 
     private int color, rusult, result, fin;
     // These matrices will be used to move and zoom image
@@ -74,12 +77,19 @@ public class RecyclerviewClickEvent implements View.OnTouchListener {
     PointF start = new PointF();
     PointF mid = new PointF();
     float oldDist = 1f;
+    private long thisTime = 0;
+    private long prevTime = 0;
+    private boolean firstTap = true;
+    protected static final long DOUBLE_CLICK_MAX_DELAY = 1000L;
 
     private final static String FURL = "<html><body><iframe width=\"1080\" height=\"720\" src=\"";
     private final static String BURL = "\" frameborder=\"0\" allowfullscreen></iframe></html></body>";
     private final static String CHANGE = "https://www.youtube.com/embed";
     @SuppressLint("ClickableViewAccessibility")
     public void Click(ListDummyItem ld_Item, Context context){
+
+        int height = context.getResources().getDisplayMetrics().heightPixels;
+        int width = context.getResources().getDisplayMetrics().widthPixels;
         this.context = context;
         ldItem = ld_Item;
         WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
@@ -117,7 +127,7 @@ public class RecyclerviewClickEvent implements View.OnTouchListener {
         Picasso.with(context).load(titlecategory(ldItem.getLd_Category())).fit().into(titleimage);
         //titleimage.setImageDrawable(titlecategory(ldItem.getLd_Category()));
         String result = ldItem.getLd_ImageUrl().replaceAll("\\/","/");
-        Picasso.with(context).load(ConAdapter.SERVER_URL + result).into(imgViewIcon);
+        Picasso.with(context).load(ConAdapter.SERVER_URL + result).resize(width, height).into(imgViewIcon);
         txtViewTitle.setText(ldItem.getLd_Title());
         txtViewId.setText(ldItem.getLd_Id());
         imgViewIcon.setLayoutParams(new ScaleRelativeLayout.LayoutParams(ScaleRelativeLayout.LayoutParams.MATCH_PARENT,
@@ -755,7 +765,6 @@ public class RecyclerviewClickEvent implements View.OnTouchListener {
                 break;
             case MotionEvent.ACTION_MOVE:
                 if (mode == DRAG) {
-                    // ...
                     matrix.set(savedMatrix);
                     matrix.getValues(matrixValues);
                     matrixX = matrixValues[2];
@@ -769,12 +778,12 @@ public class RecyclerviewClickEvent implements View.OnTouchListener {
                     dy = event.getY() - start.y;
 
                     //if image will go outside left bound
-                    if (matrixX + dx > 0){
+                    if (matrixX + dx >= 0){
                         Log.d("left bound", String.valueOf(matrixX + dx));
                         dx = -matrixX;
                     }
                     //if image will go outside right bound
-                    if(matrixX + dx + width < view.getWidth()){
+                    if(matrixX + dx + width <= view.getWidth()){
                         Log.d("right bound", String.valueOf(matrixX + dx+ width)+ "*" + String.valueOf(view.getWidth()));
                         dx = view.getWidth() - matrixX - width;
                     }/**
@@ -806,7 +815,6 @@ public class RecyclerviewClickEvent implements View.OnTouchListener {
         view.setImageMatrix(matrix);
         return true;
     }
-
     private void dumpEvent(MotionEvent event) {
         String names[] = { "DOWN", "UP", "MOVE", "CANCEL", "OUTSIDE",
                 "POINTER_DOWN", "POINTER_UP", "7?", "8?", "9?" };
