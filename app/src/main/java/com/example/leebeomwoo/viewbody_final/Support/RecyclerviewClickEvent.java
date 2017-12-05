@@ -11,6 +11,7 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.SystemClock;
+import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.widget.CardView;
 import android.text.Layout;
 import android.util.DisplayMetrics;
@@ -71,6 +72,7 @@ public class RecyclerviewClickEvent implements View.OnTouchListener {
     float matrixY = 0; // Y coordinate of matrix inside the ImageView
     float width = 0; // width of drawable
     float height = 0; // height of drawable
+    private GestureDetectorCompat mDetector;
 
     // Remember some things for zooming
     PointF start = new PointF();
@@ -123,6 +125,7 @@ public class RecyclerviewClickEvent implements View.OnTouchListener {
         Button button = dialog.findViewById(R.id.like_btn);
         WebView videoView_3 = dialog.findViewById(R.id.video_view_3);
         titleimage = dialog.findViewById(R.id.itemtitle_image);
+        mDetector = new GestureDetectorCompat(context, new MyGestureListener());
         Picasso.with(context).load(titlecategory(ldItem.getLd_Category())).fit().into(titleimage);
         //titleimage.setImageDrawable(titlecategory(ldItem.getLd_Category()));
         String result = ldItem.getLd_ImageUrl().replaceAll("\\/","/");
@@ -742,6 +745,7 @@ public class RecyclerviewClickEvent implements View.OnTouchListener {
     public boolean onTouch(View v, MotionEvent event) {
         ImageView view = (ImageView) v;
         dumpEvent(event);
+        mDetector.onTouchEvent(event);
         // Handle touch events here...
         switch (event.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
@@ -779,13 +783,15 @@ public class RecyclerviewClickEvent implements View.OnTouchListener {
                     dx = event.getX() - start.x;
                     dy = event.getY() - start.y;
 
+                    Log.d("bound", "dx=" + String.valueOf(dx) + "matrixX=" + String.valueOf(matrixX) + "width=" + String.valueOf(width));
                     //if image will go outside left bound
-                    if (matrixX + dx >= 0){
+
+                    if (matrixX + dx < 0){
                         Log.d("left bound", String.valueOf(matrixX + dx));
                         dx = -matrixX;
                     }
                     //if image will go outside right bound
-                    if(matrixX + dx + width <= view.getWidth()){
+                    if(matrixX + dx + width > view.getWidth()){
                         Log.d("right bound", String.valueOf(matrixX + dx+ width)+ "*" + String.valueOf(view.getWidth()));
                         dx = view.getWidth() - matrixX - width;
                     }
@@ -833,6 +839,51 @@ public class RecyclerviewClickEvent implements View.OnTouchListener {
         Log.d(TAG, sb.toString());
     }
 
+    class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
+        private static final String DEBUG_TAG = "Gestures";
+
+        @Override
+        public boolean onDown(MotionEvent event) {
+            Log.d(DEBUG_TAG,"onDown: " + event.toString());
+            return true;
+        }
+
+        @Override
+        public boolean onFling(MotionEvent event1, MotionEvent event2,
+                               float velocityX, float velocityY) {
+            Log.d(DEBUG_TAG, "onFling: " + event1.toString() + event2.toString());
+            return true;
+        }
+
+        @Override
+        public void onLongPress(MotionEvent event) {
+            Log.d(DEBUG_TAG, "onLongPress: " + event.toString());
+        }
+
+        @Override
+        public boolean onScroll(MotionEvent event1, MotionEvent event2, float distanceX,
+                                float distanceY) {
+            Log.d(DEBUG_TAG, "onScroll-1: " + event1.toString() + "onScroll-2: " + event2.toString());
+            return true;
+        }
+
+        @Override
+        public void onShowPress(MotionEvent event) {
+            Log.d(DEBUG_TAG, "onShowPress: " + event.toString());
+        }
+
+        @Override
+        public boolean onSingleTapUp(MotionEvent event) {
+            Log.d(DEBUG_TAG, "onSingleTapUp: " + event.toString());
+            return true;
+        }
+
+        @Override
+        public boolean onDoubleTap(MotionEvent event) {
+            Log.d(DEBUG_TAG, "onDoubleTap: " + event.toString());
+            return true;
+        }
+    }
     /** Determine the space between the first two fingers */
     private float spacing(MotionEvent event) {
         float x = event.getX(0) - event.getX(1);
