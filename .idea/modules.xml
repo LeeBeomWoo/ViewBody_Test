@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/ViewBody_Test.iml" filepath="$PROJECT_DIR$/ViewBody_Test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ViewBody_Final.iml" filepath="$PROJECT_DIR$/ViewBody_Final.iml" />
+      <module fileurl="file://E:\personal\Android_Project\ViewBody_Final\ViewBody_Test.iml" filepath="E:\personal\Android_Project\ViewBody_Final\ViewBody_Test.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>

@@ -43,28 +43,27 @@ import cn.gavinliu.android.lib.scale.ScaleRelativeLayout;
  * Created by LeeBeomWoo on 2017-06-21.
  */
 
-public class RecyclerviewClickEvent extends GestureDetector.SimpleOnGestureListener implements View.OnTouchListener {
+public class RecyclerviewClickEvent implements View.OnTouchListener {
     private static final String TAG = "Popup";
     private Context context;
     private int drawable ;
     private ImageView imgViewIcon, titleimage;
-    private TextView video_title_1, video_title_2, video_title_3, txtViewTitle, txtViewId;
-    private WebView imgViewFace, videoView_1, videoView_2, videoView_3;
     private ListDummyItem ldItem;
     ScaleRelativeLayout main;
     private CardView card;
     boolean expanded = false;
 
     private int color, rusult, result, fin;
+    private float scale_img = 1;
     // These matrices will be used to move and zoom image
-    Matrix matrix = new Matrix();
-    Matrix savedMatrix = new Matrix();
+    private Matrix matrix = new Matrix();
+    private Matrix savedMatrix = new Matrix();
 
     // We can be in one of these 3 states
-    static final int NONE = 0;
-    static final int DRAG = 1;
-    static final int ZOOM = 2;
-    int mode = NONE;
+    private static final int NONE = 0;
+    private static final int DRAG = 1;
+    private static final int ZOOM = 2;
+    private int mode = NONE;
     private float dx; // postTranslate X distance
     private float dy; // postTranslate Y distance
     private float[] matrixValues = new float[9];
@@ -105,7 +104,7 @@ public class RecyclerviewClickEvent extends GestureDetector.SimpleOnGestureListe
         dialog.getWindow().setLayout(metrics.widthPixels, metrics.heightPixels);
         //dialog.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
         main = dialog.findViewById(R.id.detail_layout);
-        txtViewTitle = dialog.findViewById(R.id.detile_Title);
+        TextView txtViewTitle = dialog.findViewById(R.id.detile_Title);
         scroll.setLayoutParams(new WindowManager.LayoutParams(WindowManager.LayoutParams.MATCH_PARENT,
                 WindowManager.LayoutParams.MATCH_PARENT));
         card = dialog.findViewById(R.id.cardView);
@@ -114,15 +113,15 @@ public class RecyclerviewClickEvent extends GestureDetector.SimpleOnGestureListe
         scroll.addView(card);
         viewGroup.addView(scroll);
         imgViewIcon = dialog.findViewById(R.id.detile_Image);
-        video_title_1 = dialog.findViewById(R.id.video_title_1);
-        video_title_2 = dialog.findViewById(R.id.video_title_2);
-        video_title_3 = dialog.findViewById(R.id.video_title_3);
-        imgViewFace = dialog.findViewById(R.id.detile_face);
-        videoView_1 = dialog.findViewById(R.id.video_view_1);
-        videoView_2 = dialog.findViewById(R.id.video_view_2);
-        txtViewId = dialog.findViewById(R.id.detile_Id);
+        TextView video_title_1 = dialog.findViewById(R.id.video_title_1);
+        TextView video_title_2 = dialog.findViewById(R.id.video_title_2);
+        TextView video_title_3 = dialog.findViewById(R.id.video_title_3);
+        WebView imgViewFace = dialog.findViewById(R.id.detile_face);
+        WebView videoView_1 = dialog.findViewById(R.id.video_view_1);
+        WebView videoView_2 = dialog.findViewById(R.id.video_view_2);
+        TextView txtViewId = dialog.findViewById(R.id.detile_Id);
         Button button = dialog.findViewById(R.id.like_btn);
-        videoView_3 = dialog.findViewById(R.id.video_view_3);
+        WebView videoView_3 = dialog.findViewById(R.id.video_view_3);
         titleimage = dialog.findViewById(R.id.itemtitle_image);
         Picasso.with(context).load(titlecategory(ldItem.getLd_Category())).fit().into(titleimage);
         //titleimage.setImageDrawable(titlecategory(ldItem.getLd_Category()));
@@ -135,6 +134,9 @@ public class RecyclerviewClickEvent extends GestureDetector.SimpleOnGestureListe
         imgViewIcon.setFocusable(true);
         imgViewIcon.setOnTouchListener(this);
         imgViewIcon.setScaleType(ImageView.ScaleType.MATRIX);
+        ScaleRelativeLayout.LayoutParams layout = new ScaleRelativeLayout.LayoutParams(ScaleRelativeLayout.LayoutParams.WRAP_CONTENT, ScaleRelativeLayout.LayoutParams.WRAP_CONTENT);
+        layout.addRule(ScaleRelativeLayout.BELOW, R.id.title_layout);
+        imgViewIcon.setLayoutParams(layout);
         webviewSet(imgViewFace, null);
         if(ldItem.getLd_Video() != null) {
             String[] animalsArray = ldItem.getLd_Video().split(",");
@@ -751,7 +753,7 @@ public class RecyclerviewClickEvent extends GestureDetector.SimpleOnGestureListe
             case MotionEvent.ACTION_POINTER_DOWN:
                 oldDist = spacing(event);
                 Log.d(TAG, "oldDist=" + oldDist);
-                if (oldDist > 10f) {
+                if (oldDist > 2) {
                     savedMatrix.set(matrix);
                     midPoint(mid, event);
                     mode = ZOOM;
@@ -786,22 +788,12 @@ public class RecyclerviewClickEvent extends GestureDetector.SimpleOnGestureListe
                     if(matrixX + dx + width <= view.getWidth()){
                         Log.d("right bound", String.valueOf(matrixX + dx+ width)+ "*" + String.valueOf(view.getWidth()));
                         dx = view.getWidth() - matrixX - width;
-                    }/**
-                    //if image will go oustside top bound
-                    if (matrixY + dy < 0){
-                        Log.d("top bound", String.valueOf(matrixY + dy));
-                        dy = -matrixY;
                     }
-                    //if image will go outside bottom bound
-                    if(matrixY + dy + height > view.getHeight()){
-                        Log.d("bottom bound", String.valueOf(matrixY + dy+ width) + "*" + String.valueOf(view.getHeight()));
-                        dy = view.getHeight() - matrixY - height;
-                    }*/
                     matrix.postTranslate(dx, dy);
                 } else if (mode == ZOOM) {
                     float newDist = spacing(event);
                     Log.d(TAG, "newDist=" + newDist);
-                    if (newDist > 10f) {
+                    if (newDist > 2) {
                         matrix.set(savedMatrix);
                         float scale = newDist / oldDist;
                         matrix.postScale(scale, scale, mid.x, mid.y);
@@ -845,7 +837,7 @@ public class RecyclerviewClickEvent extends GestureDetector.SimpleOnGestureListe
     private float spacing(MotionEvent event) {
         float x = event.getX(0) - event.getX(1);
         float y = event.getY(0) - event.getY(1);
-        return (x * x + y * y);
+        return (Math.abs(x) + Math.abs(y));
     }
 
     /** Calculate the mid point of the first two fingers */
