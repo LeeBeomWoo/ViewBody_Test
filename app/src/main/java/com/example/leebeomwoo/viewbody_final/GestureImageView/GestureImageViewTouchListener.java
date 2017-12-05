@@ -300,7 +300,7 @@ public class GestureImageViewTouchListener implements OnTouchListener {
 							pinchVector.set(event);
 							pinchVector.calculateLength();
 							
-							float distance = pinchVector.length;
+							float distance = (float)pinchVector.length;
 							
 							if(initialDistance != distance) {
 								
@@ -321,7 +321,7 @@ public class GestureImageViewTouchListener implements OnTouchListener {
 							}
 						}
 						else {
-							initialDistance = MathUtils.distance(event);
+							initialDistance = (float)MathUtils.distance(event);
 							
 							MathUtils.midpoint(event, midpoint);
 							

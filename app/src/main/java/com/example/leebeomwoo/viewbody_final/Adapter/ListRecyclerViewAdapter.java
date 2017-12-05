@@ -40,7 +40,6 @@ public class ListRecyclerViewAdapter extends RecyclerView.Adapter<ListRecyclerVi
     private List<ListDummyItem> ldItems = new ArrayList<>();
     private LikeItem lkItems;
     private Context bContext;
-    ResponseLd responseLd;
     private final static String TAG = "ListRecyclerViewAdapter";
     private final static String FURL = "<html><body><iframe width=\"1080\" height=\"720\" src=\"";
     private final static String BURL = "\" frameborder=\"0\" allowfullscreen></iframe></html></body>";
@@ -130,7 +129,7 @@ public class ListRecyclerViewAdapter extends RecyclerView.Adapter<ListRecyclerVi
                     }
                 });
             }else  if (view.getId() == imgViewIcon.getId()) {
-                clickEvent.Click(ldItems.get(getLayoutPosition()), bContext);
+                clickEvent.Click(ldItems.get(getLayoutPosition()), bContext, color);
             }else if (view.getId() == imgViewFace.getId()) {
                 intent.putExtra("itemUrl", "trainer");
                 intent.putExtra("tr_Id", getItem(getLayoutPosition()).getLd_Id());

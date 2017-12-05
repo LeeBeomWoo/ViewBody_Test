@@ -32,89 +32,56 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.leebeomwoo.viewbody_final.GestureImageView.GestureImageView;
+import com.example.leebeomwoo.viewbody_final.GestureImageView.GestureImageViewListener;
+import com.example.leebeomwoo.viewbody_final.GestureImageView.GestureImageViewTouchListener;
 import com.example.leebeomwoo.viewbody_final.Item.ListDummyItem;
 import com.example.leebeomwoo.viewbody_final.R;
 import com.squareup.picasso.Picasso;
 
 import java.util.Objects;
 
+import cn.gavinliu.android.lib.scale.ScaleLinearLayout;
 import cn.gavinliu.android.lib.scale.ScaleRelativeLayout;
 
 /**
  * Created by LeeBeomWoo on 2017-06-21.
  */
 
-public class RecyclerviewClickEvent implements View.OnTouchListener {
+public class RecyclerviewClickEvent {
     private static final String TAG = "Popup";
-    private Context context;
-    private int drawable ;
-    private ImageView imgViewIcon, titleimage;
+    private Context pcontext;
+    private GestureImageView imgViewIcon;
     private ListDummyItem ldItem;
-    ScaleRelativeLayout main;
-    private CardView card;
-    boolean expanded = false;
 
-    private int color, rusult, result, fin;
-    private float scale_img = 1;
-    // These matrices will be used to move and zoom image
-    private Matrix matrix = new Matrix();
-    private Matrix savedMatrix = new Matrix();
-
-    // We can be in one of these 3 states
-    private static final int NONE = 0;
-    private static final int DRAG = 1;
-    private static final int ZOOM = 2;
-    private int mode = NONE;
-    private float dx; // postTranslate X distance
-    private float dy; // postTranslate Y distance
-    private float[] matrixValues = new float[9];
-    float matrixX = 0; // X coordinate of matrix inside the ImageView
-    float matrixY = 0; // Y coordinate of matrix inside the ImageView
-    float width = 0; // width of drawable
-    float height = 0; // height of drawable
-    private GestureDetectorCompat mDetector;
-
+    private int colo, rusult, result, fin;
     // Remember some things for zooming
-    PointF start = new PointF();
-    PointF mid = new PointF();
-    float oldDist = 1f;
-    private long thisTime = 0;
-    private long prevTime = 0;
-    private boolean firstTap = true;
-    protected static final long DOUBLE_CLICK_MAX_DELAY = 1000L;
-
     private final static String FURL = "<html><body><iframe width=\"1080\" height=\"720\" src=\"";
     private final static String BURL = "\" frameborder=\"0\" allowfullscreen></iframe></html></body>";
     private final static String CHANGE = "https://www.youtube.com/embed";
     @SuppressLint("ClickableViewAccessibility")
-    public void Click(ListDummyItem ld_Item, Context context){
-
-        int height = context.getResources().getDisplayMetrics().heightPixels;
-        int width = context.getResources().getDisplayMetrics().widthPixels;
-        this.context = context;
+    public void Click(ListDummyItem ld_Item, Context context, int color){
+        this.colo = color;
+        this.pcontext = context;
+        int height = pcontext.getResources().getDisplayMetrics().heightPixels;
+        int width = pcontext.getResources().getDisplayMetrics().widthPixels;
         ldItem = ld_Item;
-        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        WindowManager wm = (WindowManager) pcontext.getSystemService(Context.WINDOW_SERVICE);
         DisplayMetrics metrics = new DisplayMetrics();
         if (wm != null) {
             wm.getDefaultDisplay().getMetrics(metrics);
         }
         //read your lovely variable
         Log.d(TAG, ldItem.getLd_ImageUrl());
-        Dialog dialog = new Dialog(context);
+        Dialog dialog = new Dialog(pcontext);
         dialog.setContentView(R.layout.fragment_detail);
-        ScrollView scroll = new ScrollView(context);
         dialog.getWindow().setLayout(metrics.widthPixels, metrics.heightPixels);
-        //dialog.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
-        main = dialog.findViewById(R.id.detail_layout);
+        imgViewIcon = new GestureImageView(pcontext);
+
         TextView txtViewTitle = dialog.findViewById(R.id.detile_Title);
-        scroll.setLayoutParams(new WindowManager.LayoutParams(WindowManager.LayoutParams.MATCH_PARENT,
-                WindowManager.LayoutParams.MATCH_PARENT));
-        card = dialog.findViewById(R.id.cardView);
-        ViewGroup viewGroup = ((ViewGroup)card.getParent());
-        viewGroup.removeView(card);
-        scroll.addView(card);
-        viewGroup.addView(scroll);
-        imgViewIcon = dialog.findViewById(R.id.detile_Image);
+        CardView card = dialog.findViewById(R.id.cardView);
+        imgViewIcon.setId(R.id.detile_Image);
+        ScaleLinearLayout main = dialog.findViewById(R.id.detail_layout);
         TextView video_title_1 = dialog.findViewById(R.id.video_title_1);
         TextView video_title_2 = dialog.findViewById(R.id.video_title_2);
         TextView video_title_3 = dialog.findViewById(R.id.video_title_3);
@@ -124,23 +91,29 @@ public class RecyclerviewClickEvent implements View.OnTouchListener {
         TextView txtViewId = dialog.findViewById(R.id.detile_Id);
         Button button = dialog.findViewById(R.id.like_btn);
         WebView videoView_3 = dialog.findViewById(R.id.video_view_3);
-        titleimage = dialog.findViewById(R.id.itemtitle_image);
-        mDetector = new GestureDetectorCompat(context, new MyGestureListener());
-        Picasso.with(context).load(titlecategory(ldItem.getLd_Category())).fit().into(titleimage);
-        //titleimage.setImageDrawable(titlecategory(ldItem.getLd_Category()));
-        String result = ldItem.getLd_ImageUrl().replaceAll("\\/","/");
-        Picasso.with(context).load(ConAdapter.SERVER_URL + result).resize(width, height).into(imgViewIcon);
-        txtViewTitle.setText(ldItem.getLd_Title());
-        txtViewId.setText(ldItem.getLd_Id());
-        imgViewIcon.setLayoutParams(new ScaleRelativeLayout.LayoutParams(ScaleRelativeLayout.LayoutParams.MATCH_PARENT,
-                ScaleRelativeLayout.LayoutParams.WRAP_CONTENT));
-        imgViewIcon.setFocusable(true);
-        imgViewIcon.setOnTouchListener(this);
-        imgViewIcon.setScaleType(ImageView.ScaleType.MATRIX);
-        ScaleRelativeLayout.LayoutParams layout = new ScaleRelativeLayout.LayoutParams(ScaleRelativeLayout.LayoutParams.WRAP_CONTENT, ScaleRelativeLayout.LayoutParams.WRAP_CONTENT);
-        layout.addRule(ScaleRelativeLayout.BELOW, R.id.title_layout);
+        ImageView titleimage = dialog.findViewById(R.id.itemtitle_image);
+        main.addView(imgViewIcon,1);
+        titleimage.setBackgroundResource(colo);
+        ScaleLinearLayout.LayoutParams layout = new ScaleLinearLayout.LayoutParams(ScaleLinearLayout.LayoutParams.MATCH_PARENT, ScaleLinearLayout.LayoutParams.MATCH_PARENT);
+        //layout.addRule(ScaleRelativeLayout.BELOW, R.id.title_layout);
         imgViewIcon.setLayoutParams(layout);
-        webviewSet(imgViewFace, null);
+        switch (colo){
+            case R.drawable.body_title_back:
+                txtViewTitle.setBackgroundResource(R.drawable.body_title_text_back);
+                break;
+            case R.drawable.follow_title_back:
+                txtViewTitle.setBackgroundResource(R.drawable.follow_title_text_back);
+                break;
+            case R.drawable.food_title_back:
+                txtViewTitle.setBackgroundResource(R.drawable.food_title_text_back);
+                break;
+            case R.drawable.new_title_back:
+                txtViewTitle.setBackgroundResource(R.drawable.new_title_text_back);
+                break;
+            case R.drawable.writer_title_back:
+                txtViewTitle.setBackgroundResource(R.drawable.writer_title_text_back);
+                break;
+        }
         if(ldItem.getLd_Video() != null) {
             String[] animalsArray = ldItem.getLd_Video().split(",");
             for(int i = 0; i < animalsArray.length; i++) {
@@ -174,6 +147,31 @@ public class RecyclerviewClickEvent implements View.OnTouchListener {
             }
 
         }
+        Picasso.with(context).load(titlecategory(ldItem.getLd_Category())).fit().into(titleimage);
+        String result = ldItem.getLd_ImageUrl().replaceAll("\\/","/");
+        Picasso.with(context).load(ConAdapter.SERVER_URL + result).resize(width, height).into(imgViewIcon);
+        txtViewTitle.setText(ldItem.getLd_Title());
+        txtViewId.setText(ldItem.getLd_Id());
+        imgViewIcon.setFocusable(true);
+        imgViewIcon.setGestureImageViewListener(new GestureImageViewListener() {
+            @Override
+            public void onTouch(float x, float y) {
+                imgViewIcon.setStartingScale(imgViewIcon.getScale());
+            }
+
+            @Override
+            public void onScale(float scale) {
+                imgViewIcon.setStartingScale(scale);
+            }
+
+            @Override
+            public void onPosition(float x, float y) {
+                imgViewIcon.setPosition(x,y);
+            }
+        });
+        imgViewIcon.setMaxScale(3);
+        imgViewIcon.setMinScale(1);
+        webviewSet(imgViewFace, null);
         dialog.show();
     }
     private void webviewSet(WebView webview, String source){
@@ -741,149 +739,6 @@ public class RecyclerviewClickEvent implements View.OnTouchListener {
         return fin;
     }
 
-    @Override
-    public boolean onTouch(View v, MotionEvent event) {
-        ImageView view = (ImageView) v;
-        dumpEvent(event);
-        mDetector.onTouchEvent(event);
-        // Handle touch events here...
-        switch (event.getAction() & MotionEvent.ACTION_MASK) {
-            case MotionEvent.ACTION_DOWN:
-                savedMatrix.set(matrix);
-                start.set(event.getX(), event.getY());
-                Log.d(TAG, "mode=DRAG");
-                mode = DRAG;
-                break;
-            case MotionEvent.ACTION_POINTER_DOWN:
-                oldDist = spacing(event);
-                Log.d(TAG, "oldDist=" + oldDist);
-                if (oldDist > 2) {
-                    savedMatrix.set(matrix);
-                    midPoint(mid, event);
-                    mode = ZOOM;
-                    Log.d(TAG, "mode=ZOOM");
-                }
-                break;
-            case MotionEvent.ACTION_UP:
-            case MotionEvent.ACTION_POINTER_UP:
-                mode = NONE;
-                Log.d(TAG, "mode=NONE");
-                break;
-            case MotionEvent.ACTION_MOVE:
-                if (mode == DRAG) {
-                    matrix.set(savedMatrix);
-                    matrix.getValues(matrixValues);
-                    matrixX = matrixValues[2];
-                    matrixY = matrixValues[5];
-                    width = matrixValues[0] * ((view).getDrawable()
-                            .getIntrinsicWidth());
-                    height = matrixValues[4] * ((view).getDrawable()
-                            .getIntrinsicHeight());
-
-                    dx = event.getX() - start.x;
-                    dy = event.getY() - start.y;
-
-                    Log.d("bound", "dx=" + String.valueOf(dx) + "matrixX=" + String.valueOf(matrixX) + "width=" + String.valueOf(width));
-                    //if image will go outside left bound
-
-                    if (matrixX + dx < 0){
-                        Log.d("left bound", String.valueOf(matrixX + dx));
-                        dx = -matrixX;
-                    }
-                    //if image will go outside right bound
-                    if(matrixX + dx + width > view.getWidth()){
-                        Log.d("right bound", String.valueOf(matrixX + dx+ width)+ "*" + String.valueOf(view.getWidth()));
-                        dx = view.getWidth() - matrixX - width;
-                    }
-                    matrix.postTranslate(dx, dy);
-                } else if (mode == ZOOM) {
-                    float newDist = spacing(event);
-                    Log.d(TAG, "newDist=" + newDist);
-                    if (newDist > 2) {
-                        matrix.set(savedMatrix);
-                        float scale = newDist / oldDist;
-                        matrix.postScale(scale, scale, mid.x, mid.y);
-                    }
-                }
-                break;
-        }
-        ScaleRelativeLayout.LayoutParams layout = new ScaleRelativeLayout.LayoutParams(ScaleRelativeLayout.LayoutParams.WRAP_CONTENT, ScaleRelativeLayout.LayoutParams.WRAP_CONTENT);
-        layout.addRule(ScaleRelativeLayout.BELOW, R.id.title_layout);
-        view.setLayoutParams(layout);
-        view.setImageMatrix(matrix);
-        return true;
-    }
-    private void dumpEvent(MotionEvent event) {
-        String names[] = { "DOWN", "UP", "MOVE", "CANCEL", "OUTSIDE",
-                "POINTER_DOWN", "POINTER_UP", "7?", "8?", "9?" };
-        StringBuilder sb = new StringBuilder();
-        int action = event.getAction();
-        int actionCode = action & MotionEvent.ACTION_MASK;
-        sb.append("event ACTION_").append(names[actionCode]);
-        if (actionCode == MotionEvent.ACTION_POINTER_DOWN
-                || actionCode == MotionEvent.ACTION_POINTER_UP) {
-            sb.append("(pid ").append(
-                    action >> MotionEvent.ACTION_POINTER_ID_SHIFT);
-            sb.append(")");
-        }
-        sb.append("[");
-        for (int i = 0; i < event.getPointerCount(); i++) {
-            sb.append("#").append(i);
-            sb.append("(pid ").append(event.getPointerId(i));
-            sb.append(")=").append((int) event.getX(i));
-            sb.append(",").append((int) event.getY(i));
-            if (i + 1 < event.getPointerCount())
-                sb.append(";");
-        }
-        sb.append("]");
-        Log.d(TAG, sb.toString());
-    }
-
-    class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
-        private static final String DEBUG_TAG = "Gestures";
-
-        @Override
-        public boolean onDown(MotionEvent event) {
-            Log.d(DEBUG_TAG,"onDown: " + event.toString());
-            return true;
-        }
-
-        @Override
-        public boolean onFling(MotionEvent event1, MotionEvent event2,
-                               float velocityX, float velocityY) {
-            Log.d(DEBUG_TAG, "onFling: " + event1.toString() + event2.toString());
-            return true;
-        }
-
-        @Override
-        public void onLongPress(MotionEvent event) {
-            Log.d(DEBUG_TAG, "onLongPress: " + event.toString());
-        }
-
-        @Override
-        public boolean onScroll(MotionEvent event1, MotionEvent event2, float distanceX,
-                                float distanceY) {
-            Log.d(DEBUG_TAG, "onScroll-1: " + event1.toString() + "onScroll-2: " + event2.toString());
-            return true;
-        }
-
-        @Override
-        public void onShowPress(MotionEvent event) {
-            Log.d(DEBUG_TAG, "onShowPress: " + event.toString());
-        }
-
-        @Override
-        public boolean onSingleTapUp(MotionEvent event) {
-            Log.d(DEBUG_TAG, "onSingleTapUp: " + event.toString());
-            return true;
-        }
-
-        @Override
-        public boolean onDoubleTap(MotionEvent event) {
-            Log.d(DEBUG_TAG, "onDoubleTap: " + event.toString());
-            return true;
-        }
-    }
     /** Determine the space between the first two fingers */
     private float spacing(MotionEvent event) {
         float x = event.getX(0) - event.getX(1);
