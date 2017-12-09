@@ -129,7 +129,7 @@ public class ListRecyclerViewAdapter extends RecyclerView.Adapter<ListRecyclerVi
                     }
                 });
             }else  if (view.getId() == imgViewIcon.getId()) {
-                clickEvent.Click(ldItems.get(getLayoutPosition()), bContext, color);
+                clickEvent.Click(ldItems.get(getLayoutPosition()), bContext);
             }else if (view.getId() == imgViewFace.getId()) {
                 intent.putExtra("itemUrl", "trainer");
                 intent.putExtra("tr_Id", getItem(getLayoutPosition()).getLd_Id());
