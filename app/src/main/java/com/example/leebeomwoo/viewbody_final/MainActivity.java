@@ -182,37 +182,37 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private int imageSet(int f){
         switch (f){
             case 0:
-                result = R.drawable.menu_new;
+                result = R.drawable.menu_new_ico;
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     collapse_space.setTransitionName("home");
                 }
                 break;
             case 1:
-                result = R.drawable.menu_body;
+                result = R.drawable.menu_body_ico;
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     collapse_space.setTransitionName("body");
                 }
                 break;
             case 2:
-                result = R.drawable.menu_follow;
+                result = R.drawable.menu_follow_ico;
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     collapse_space.setTransitionName("follow");
                 }
                 break;
             case 3:
-                result = R.drawable.menu_food;
+                result = R.drawable.menu_food_ico;
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     collapse_space.setTransitionName("food");
                 }
                 break;
             case 4:
-                result = R.drawable.menu_writer;
+                result = R.drawable.menu_writer_ico;
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     collapse_space.setTransitionName("writer");
                 }
                 break;
             case 5:
-                result = R.drawable.menu_qna;
+                result = R.drawable.menu_qna_ico;
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     collapse_space.setTransitionName("qna");
                 }

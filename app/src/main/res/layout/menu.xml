@@ -119,7 +119,8 @@
                     android:layout_margin="5dp"
                     android:layout_marginStart="10dp"
                     android:background="@color/nocolor"
-                    android:scaleType="centerCrop"
+                    android:padding="5dp"
+                    android:scaleType="fitCenter"
                     app:srcCompat="@drawable/menu_body"
                     tools:ignore="ContentDescription" />
 
@@ -139,7 +140,8 @@
                     android:layout_marginRight="5dp"
                     android:layout_marginStart="10dp"
                     android:background="@color/nocolor"
-                    android:scaleType="centerCrop"
+                    android:padding="5dp"
+                    android:scaleType="fitCenter"
                     app:srcCompat="@drawable/menu_follow"
                     tools:ignore="ContentDescription" />
 
@@ -157,7 +159,8 @@
                     android:layout_margin="5dp"
                     android:layout_marginStart="10dp"
                     android:background="@color/nocolor"
-                    android:scaleType="centerCrop"
+                    android:padding="5dp"
+                    android:scaleType="fitCenter"
                     app:srcCompat="@drawable/menu_food"
                     tools:ignore="ContentDescription" />
 
@@ -177,9 +180,10 @@
                     android:layout_marginRight="5dp"
                     android:layout_marginStart="10dp"
                     android:background="@color/nocolor"
-                    android:scaleType="centerCrop"
+                    android:scaleType="fitCenter"
                     app:srcCompat="@drawable/menu_writer"
-                    tools:ignore="ContentDescription" />
+                    tools:ignore="ContentDescription"
+                    android:padding="5dp" />
 
                 <ImageView
                     android:id="@+id/imageView8"
@@ -197,7 +201,8 @@
                     android:layout_marginRight="5dp"
                     android:layout_marginStart="10dp"
                     android:background="@color/nocolor"
-                    android:scaleType="centerCrop"
+                    android:padding="5dp"
+                    android:scaleType="fitCenter"
                     app:srcCompat="@drawable/menu_qna"
                     tools:ignore="ContentDescription" />
 
