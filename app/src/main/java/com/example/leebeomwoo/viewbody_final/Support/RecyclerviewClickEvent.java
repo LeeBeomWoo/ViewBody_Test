@@ -11,7 +11,6 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.SystemClock;
-import android.support.design.widget.AppBarLayout;
 import android.support.v7.widget.CardView;
 import android.text.Layout;
 import android.util.DisplayMetrics;
@@ -21,22 +20,18 @@ import android.view.Display;
 import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.MotionEvent;
-import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.Button;
-import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.leebeomwoo.viewbody_final.Item.ListDummyItem;
-import com.example.leebeomwoo.viewbody_final.MainActivity;
 import com.example.leebeomwoo.viewbody_final.R;
 import com.squareup.picasso.Picasso;
 
@@ -64,7 +59,7 @@ public class RecyclerviewClickEvent extends GestureDetector.SimpleOnGestureListe
     // These matrices will be used to move and zoom image
     Matrix matrix = new Matrix();
     Matrix savedMatrix = new Matrix();
-    Matrix defaultMatrix = new Matrix();
+
     // We can be in one of these 3 states
     static final int NONE = 0;
     static final int DRAG = 1;
@@ -77,7 +72,7 @@ public class RecyclerviewClickEvent extends GestureDetector.SimpleOnGestureListe
     float matrixY = 0; // Y coordinate of matrix inside the ImageView
     float width = 0; // width of drawable
     float height = 0; // height of drawable
-    int de_width, de_height, maxLeft, maxRight, maxTop, maxBottom;
+
     // Remember some things for zooming
     PointF start = new PointF();
     PointF mid = new PointF();
@@ -86,20 +81,15 @@ public class RecyclerviewClickEvent extends GestureDetector.SimpleOnGestureListe
     private long prevTime = 0;
     private boolean firstTap = true;
     protected static final long DOUBLE_CLICK_MAX_DELAY = 1000L;
-    GestureDetector detector;
+
     private final static String FURL = "<html><body><iframe width=\"1080\" height=\"720\" src=\"";
     private final static String BURL = "\" frameborder=\"0\" allowfullscreen></iframe></html></body>";
     private final static String CHANGE = "https://www.youtube.com/embed";
     @SuppressLint("ClickableViewAccessibility")
     public void Click(ListDummyItem ld_Item, Context context){
 
-        de_height = context.getResources().getDisplayMetrics().heightPixels;
-        de_width = context.getResources().getDisplayMetrics().widthPixels;
-
-        maxLeft = (de_width * -1);
-        maxRight = de_width;
-        maxTop = (de_height * -1);
-        maxBottom = de_height;
+        int height = context.getResources().getDisplayMetrics().heightPixels;
+        int width = context.getResources().getDisplayMetrics().widthPixels;
         this.context = context;
         ldItem = ld_Item;
         WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
@@ -107,7 +97,6 @@ public class RecyclerviewClickEvent extends GestureDetector.SimpleOnGestureListe
         if (wm != null) {
             wm.getDefaultDisplay().getMetrics(metrics);
         }
-        detector = new GestureDetector(listener);
         //read your lovely variable
         Log.d(TAG, ldItem.getLd_ImageUrl());
         Dialog dialog = new Dialog(context);
@@ -124,10 +113,7 @@ public class RecyclerviewClickEvent extends GestureDetector.SimpleOnGestureListe
         viewGroup.removeView(card);
         scroll.addView(card);
         viewGroup.addView(scroll);
-        ScaleRelativeLayout.LayoutParams layout = new ScaleRelativeLayout.LayoutParams(ScaleRelativeLayout.LayoutParams.MATCH_PARENT, ScaleRelativeLayout.LayoutParams.WRAP_CONTENT);
-        layout.addRule(ScaleRelativeLayout.BELOW, R.id.title_layout);
         imgViewIcon = dialog.findViewById(R.id.detile_Image);
-        imgViewIcon.setLayoutParams(layout);
         video_title_1 = dialog.findViewById(R.id.video_title_1);
         video_title_2 = dialog.findViewById(R.id.video_title_2);
         video_title_3 = dialog.findViewById(R.id.video_title_3);
@@ -141,7 +127,7 @@ public class RecyclerviewClickEvent extends GestureDetector.SimpleOnGestureListe
         Picasso.with(context).load(titlecategory(ldItem.getLd_Category())).fit().into(titleimage);
         //titleimage.setImageDrawable(titlecategory(ldItem.getLd_Category()));
         String result = ldItem.getLd_ImageUrl().replaceAll("\\/","/");
-        Picasso.with(context).load(ConAdapter.SERVER_URL + result).resize(de_width, de_height).into(imgViewIcon);
+        Picasso.with(context).load(ConAdapter.SERVER_URL + result).resize(width, height).into(imgViewIcon);
         txtViewTitle.setText(ldItem.getLd_Title());
         txtViewId.setText(ldItem.getLd_Id());
         imgViewIcon.setLayoutParams(new ScaleRelativeLayout.LayoutParams(ScaleRelativeLayout.LayoutParams.MATCH_PARENT,
@@ -183,7 +169,6 @@ public class RecyclerviewClickEvent extends GestureDetector.SimpleOnGestureListe
             }
 
         }
-        defaultMatrix = imgViewIcon.getImageMatrix();
         dialog.show();
     }
     private void webviewSet(WebView webview, String source){
@@ -751,42 +736,10 @@ public class RecyclerviewClickEvent extends GestureDetector.SimpleOnGestureListe
         return fin;
     }
 
-    private GestureDetector.SimpleOnGestureListener listener = new GestureDetector.SimpleOnGestureListener() {
-        @Override
-        public boolean onDoubleTap(MotionEvent e) {
-            if(expanded){
-                imgViewIcon.setImageMatrix(defaultMatrix);
-                imgViewIcon.setScaleY(1);
-                imgViewIcon.setScaleX(1);
-                expanded = false;
-            }else {
-                imgViewIcon.setImageMatrix(defaultMatrix);
-                imgViewIcon.setScaleY(2);
-                imgViewIcon.setScaleX(2);
-                expanded = true;
-            }
-            return true;
-        }
-
-        @Override
-        public void onLongPress(MotionEvent e) {
-            Toast.makeText(context, "onLongPress", Toast.LENGTH_SHORT).show();
-        }
-
-        @Override
-        public boolean onScroll(MotionEvent e, MotionEvent e1, float v, float v1) {
-
-            return true;
-        }
-
-    };
     @Override
     public boolean onTouch(View v, MotionEvent event) {
         ImageView view = (ImageView) v;
         dumpEvent(event);
-        detector.onTouchEvent(event);
-        int totalX, totalY;
-        int scrollByX, scrollByY;
         // Handle touch events here...
         switch (event.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
@@ -812,7 +765,6 @@ public class RecyclerviewClickEvent extends GestureDetector.SimpleOnGestureListe
                 break;
             case MotionEvent.ACTION_MOVE:
                 if (mode == DRAG) {
-                    /**
                     matrix.set(savedMatrix);
                     matrix.getValues(matrixValues);
                     matrixX = matrixValues[2];
@@ -821,8 +773,7 @@ public class RecyclerviewClickEvent extends GestureDetector.SimpleOnGestureListe
                             .getIntrinsicWidth());
                     height = matrixValues[4] * ((view).getDrawable()
                             .getIntrinsicHeight());
-                        Log.d("imgeview", String.valueOf(imgViewIcon.getWidth()));
-                    Log.d("imgeresource", String.valueOf(imgViewIcon.getResources()..getWidth()));
+
                     dx = event.getX() - start.x;
                     dy = event.getY() - start.y;
 
@@ -835,107 +786,35 @@ public class RecyclerviewClickEvent extends GestureDetector.SimpleOnGestureListe
                     if(matrixX + dx + width <= view.getWidth()){
                         Log.d("right bound", String.valueOf(matrixX + dx+ width)+ "*" + String.valueOf(view.getWidth()));
                         dx = view.getWidth() - matrixX - width;
+                    }/**
+                    //if image will go oustside top bound
+                    if (matrixY + dy < 0){
+                        Log.d("top bound", String.valueOf(matrixY + dy));
+                        dy = -matrixY;
                     }
-                    float currentX, currentY;
-                            currentX = event.getX();
-                            currentY = event.getY();
-                            scrollByX = (int)(start.x - currentX);
-                            scrollByY = (int)(start.y - currentY);
-
-                            // scrolling to left side of image (pic moving to the right)
-                            if (currentX > start.x)
-                            {
-                                if (totalX == maxLeft)
-                                {
-                                    scrollByX = 0;
-                                }
-                                if (totalX > maxLeft)
-                                {
-                                    totalX = totalX + scrollByX;
-                                }
-                                if (totalX < maxLeft)
-                                {
-                                    scrollByX = maxLeft - (totalX - scrollByX);
-                                    totalX = maxLeft;
-                                }
-                            }
-
-                            // scrolling to right side of image (pic moving to the left)
-                            if (currentX < start.x)
-                            {
-                                if (totalX == maxRight)
-                                {
-                                    scrollByX = 0;
-                                }
-                                if (totalX < maxRight)
-                                {
-                                    totalX = totalX + scrollByX;
-                                }
-                                if (totalX > maxRight)
-                                {
-                                    scrollByX = maxRight - (totalX - scrollByX);
-                                    totalX = maxRight;
-                                }
-                            }
-
-                            // scrolling to top of image (pic moving to the bottom)
-                            if (currentY > start.y)
-                            {
-                                if (totalY == maxTop)
-                                {
-                                    scrollByY = 0;
-                                }
-                                if (totalY > maxTop)
-                                {
-                                    totalY = totalY + scrollByY;
-                                }
-                                if (totalY < maxTop)
-                                {
-                                    scrollByY = maxTop - (totalY - scrollByY);
-                                    totalY = maxTop;
-                                }
-                            }
-
-                            // scrolling to bottom of image (pic moving to the top)
-                            if (currentY < start.y)
-                            {
-                                if (totalY == maxBottom)
-                                {
-                                    scrollByY = 0;
-                                }
-                                if (totalY < maxBottom)
-                                {
-                                    totalY = totalY + scrollByY;
-                                }
-                                if (totalY > maxBottom)
-                                {
-                                    scrollByY = maxBottom - (totalY - scrollByY);
-                                    totalY = maxBottom;
-                                }
-                            }
-
-                            view.scrollBy(scrollByX, scrollByY);
-                    start.x = currentX;
-                    start.y = currentY;*/
-                            break;
-                }else if (mode == ZOOM) {
+                    //if image will go outside bottom bound
+                    if(matrixY + dy + height > view.getHeight()){
+                        Log.d("bottom bound", String.valueOf(matrixY + dy+ width) + "*" + String.valueOf(view.getHeight()));
+                        dy = view.getHeight() - matrixY - height;
+                    }*/
+                    matrix.postTranslate(dx, dy);
+                } else if (mode == ZOOM) {
                     float newDist = spacing(event);
                     Log.d(TAG, "newDist=" + newDist);
-                    matrix.set(savedMatrix);
-                    float scale = newDist / oldDist;
-                    Log.d(TAG, "scale=" + String.valueOf(scale));
-                    matrix.postScale(scale, scale, mid.x, mid.y);
+                    if (newDist > 10f) {
+                        matrix.set(savedMatrix);
+                        float scale = newDist / oldDist;
+                        matrix.postScale(scale, scale, mid.x, mid.y);
+                    }
                 }
                 break;
         }
-        /**
         ScaleRelativeLayout.LayoutParams layout = new ScaleRelativeLayout.LayoutParams(ScaleRelativeLayout.LayoutParams.WRAP_CONTENT, ScaleRelativeLayout.LayoutParams.WRAP_CONTENT);
         layout.addRule(ScaleRelativeLayout.BELOW, R.id.title_layout);
         view.setLayoutParams(layout);
-        view.setImageMatrix(matrix);*/
+        view.setImageMatrix(matrix);
         return true;
     }
-
     private void dumpEvent(MotionEvent event) {
         String names[] = { "DOWN", "UP", "MOVE", "CANCEL", "OUTSIDE",
                 "POINTER_DOWN", "POINTER_UP", "7?", "8?", "9?" };

@@ -8,7 +8,7 @@
     android:layout_marginBottom="10dp"
     android:orientation="horizontal">
 
-    <cn.gavinliu.android.lib.scale.ScaleRelativeLayout
+    <cn.gavinliu.android.lib.scale.ScaleLinearLayout
         android:id="@+id/detail_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -110,10 +110,12 @@
 
 
         <RelativeLayout
+            android:id="@+id/bottom_detail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/video_view_3"
-            android:background="@color/cardview_light_background">
+            android:background="@color/cardview_light_background"
+            android:visibility="visible">
 
             <WebView
                 android:id="@+id/detile_face"
@@ -147,6 +149,6 @@
 
         </RelativeLayout>
 
-    </cn.gavinliu.android.lib.scale.ScaleRelativeLayout>
+    </cn.gavinliu.android.lib.scale.ScaleLinearLayout>
 
 </android.support.v7.widget.CardView>
