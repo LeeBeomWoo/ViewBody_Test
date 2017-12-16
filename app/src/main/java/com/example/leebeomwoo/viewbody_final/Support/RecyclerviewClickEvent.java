@@ -37,6 +37,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.Objects;
 
+import cn.gavinliu.android.lib.scale.ScaleLinearLayout;
 import cn.gavinliu.android.lib.scale.ScaleRelativeLayout;
 
 /**
@@ -51,7 +52,6 @@ public class RecyclerviewClickEvent extends GestureDetector.SimpleOnGestureListe
     private TextView video_title_1, video_title_2, video_title_3, txtViewTitle, txtViewId;
     private WebView imgViewFace, videoView_1, videoView_2, videoView_3;
     private ListDummyItem ldItem;
-    ScaleRelativeLayout main;
     private CardView card;
     boolean expanded = false;
 
@@ -65,8 +65,7 @@ public class RecyclerviewClickEvent extends GestureDetector.SimpleOnGestureListe
     static final int DRAG = 1;
     static final int ZOOM = 2;
     int mode = NONE;
-    private float dx; // postTranslate X distance
-    private float dy; // postTranslate Y distance
+    private float dx, dy, tempx, tempy; // postTranslate X distance
     private float[] matrixValues = new float[9];
     float matrixX = 0; // X coordinate of matrix inside the ImageView
     float matrixY = 0; // Y coordinate of matrix inside the ImageView
@@ -88,8 +87,6 @@ public class RecyclerviewClickEvent extends GestureDetector.SimpleOnGestureListe
     @SuppressLint("ClickableViewAccessibility")
     public void Click(ListDummyItem ld_Item, Context context){
 
-        int height = context.getResources().getDisplayMetrics().heightPixels;
-        int width = context.getResources().getDisplayMetrics().widthPixels;
         this.context = context;
         ldItem = ld_Item;
         WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
@@ -97,14 +94,15 @@ public class RecyclerviewClickEvent extends GestureDetector.SimpleOnGestureListe
         if (wm != null) {
             wm.getDefaultDisplay().getMetrics(metrics);
         }
+        int height = metrics.heightPixels;
+        int width = metrics.widthPixels;
         //read your lovely variable
         Log.d(TAG, ldItem.getLd_ImageUrl());
         Dialog dialog = new Dialog(context);
         dialog.setContentView(R.layout.fragment_detail);
         ScrollView scroll = new ScrollView(context);
-        dialog.getWindow().setLayout(metrics.widthPixels, metrics.heightPixels);
+        dialog.getWindow().setLayout(width, height);
         //dialog.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
-        main = dialog.findViewById(R.id.detail_layout);
         txtViewTitle = dialog.findViewById(R.id.detile_Title);
         scroll.setLayoutParams(new WindowManager.LayoutParams(WindowManager.LayoutParams.MATCH_PARENT,
                 WindowManager.LayoutParams.MATCH_PARENT));
@@ -130,8 +128,8 @@ public class RecyclerviewClickEvent extends GestureDetector.SimpleOnGestureListe
         Picasso.with(context).load(ConAdapter.SERVER_URL + result).resize(width, height).into(imgViewIcon);
         txtViewTitle.setText(ldItem.getLd_Title());
         txtViewId.setText(ldItem.getLd_Id());
-        imgViewIcon.setLayoutParams(new ScaleRelativeLayout.LayoutParams(ScaleRelativeLayout.LayoutParams.MATCH_PARENT,
-                ScaleRelativeLayout.LayoutParams.WRAP_CONTENT));
+        imgViewIcon.setLayoutParams(new ScaleLinearLayout.LayoutParams(ScaleLinearLayout.LayoutParams.MATCH_PARENT,
+                ScaleLinearLayout.LayoutParams.WRAP_CONTENT));
         imgViewIcon.setFocusable(true);
         imgViewIcon.setOnTouchListener(this);
         imgViewIcon.setScaleType(ImageView.ScaleType.MATRIX);
@@ -773,10 +771,15 @@ public class RecyclerviewClickEvent extends GestureDetector.SimpleOnGestureListe
                             .getIntrinsicWidth());
                     height = matrixValues[4] * ((view).getDrawable()
                             .getIntrinsicHeight());
-
                     dx = event.getX() - start.x;
                     dy = event.getY() - start.y;
-
+                    if(tempx - event.getX() > 0) {// mouse moving left
+                        Log.d("moving bound", "왼쪽 이동");
+                    }else {// mouse moving right
+                        Log.d("moving bound", "오른쪽 이동");
+                    }
+                    tempx = event.getX();
+                    tempy = event.getY();
                     //if image will go outside left bound
                     if (matrixX + dx >= 0){
                         Log.d("left bound", String.valueOf(matrixX + dx));
@@ -786,17 +789,9 @@ public class RecyclerviewClickEvent extends GestureDetector.SimpleOnGestureListe
                     if(matrixX + dx + width <= view.getWidth()){
                         Log.d("right bound", String.valueOf(matrixX + dx+ width)+ "*" + String.valueOf(view.getWidth()));
                         dx = view.getWidth() - matrixX - width;
-                    }/**
-                    //if image will go oustside top bound
-                    if (matrixY + dy < 0){
-                        Log.d("top bound", String.valueOf(matrixY + dy));
-                        dy = -matrixY;
                     }
-                    //if image will go outside bottom bound
-                    if(matrixY + dy + height > view.getHeight()){
-                        Log.d("bottom bound", String.valueOf(matrixY + dy+ width) + "*" + String.valueOf(view.getHeight()));
-                        dy = view.getHeight() - matrixY - height;
-                    }*/
+
+                    Log.d("dx bound", String.valueOf(dx));
                     matrix.postTranslate(dx, dy);
                 } else if (mode == ZOOM) {
                     float newDist = spacing(event);
@@ -809,8 +804,7 @@ public class RecyclerviewClickEvent extends GestureDetector.SimpleOnGestureListe
                 }
                 break;
         }
-        ScaleRelativeLayout.LayoutParams layout = new ScaleRelativeLayout.LayoutParams(ScaleRelativeLayout.LayoutParams.WRAP_CONTENT, ScaleRelativeLayout.LayoutParams.WRAP_CONTENT);
-        layout.addRule(ScaleRelativeLayout.BELOW, R.id.title_layout);
+        ScaleLinearLayout.LayoutParams layout = new ScaleLinearLayout.LayoutParams(ScaleLinearLayout.LayoutParams.WRAP_CONTENT, ScaleLinearLayout.LayoutParams.WRAP_CONTENT);
         view.setLayoutParams(layout);
         view.setImageMatrix(matrix);
         return true;

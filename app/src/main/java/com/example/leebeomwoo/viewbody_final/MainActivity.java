@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private boolean mIsTheTitleVisible          = false;
     private boolean mIsTheTitleContainerVisible = true;
-    TextView license_source, license_Title, mTitle;
+    TextView license_source, license_Title, mTitle, expand_lbl;
     ViewPager viewPager;
     ScaleLinearLayout mTitleContainer;
     PopupWindow mPopupWindow;
@@ -127,7 +127,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .load(imageSet(i))
                 .fit()
                 .noFade()
-                .centerCrop()
+                .centerInside()
                 .into(collapse_space, new Callback() {
                     @Override
                     public void onSuccess() {
@@ -138,6 +138,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         supportStartPostponedEnterTransition();
                     }
                 });
+        expand_lbl.setText(titleSet(i));
 
         context = this;
         // Get access to the custom title view
@@ -149,7 +150,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             setupDrawerContent(navigationView);
         }
         ArrayList<MainTabItem> mainMenuItems = new ArrayList<>();
-        mainMenuItems.add(new MainTabItem("홈", null, Home_Tab.class));
+        mainMenuItems.add(new MainTabItem("금주의 자료", null, Home_Tab.class));
         mainMenuItems.add(new MainTabItem("몸과 운동", null, BodyTab_Sub.class));
         mainMenuItems.add(new MainTabItem("동영상 따라하기", null, FollowTab_Sub.class));
         mainMenuItems.add(new MainTabItem("음식과 영양", null, FoodTab_Sub.class));
@@ -169,6 +170,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 toolbar_space.setImageDrawable(getResources().getDrawable(imageSet(position)));
                 collapse_space.setImageDrawable(getResources().getDrawable(imageSet(position)));
                 main_back.setImageDrawable(getResources().getDrawable(main_set(position)));
+                expand_lbl.setText(titleSet(position));
             }
 
             @Override
@@ -216,6 +218,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     collapse_space.setTransitionName("qna");
                 }
+                break;
+        }
+        return result;
+    }
+    private int titleSet(int f){
+        switch (f){
+            case 0:
+                result = R.string.tab5;
+                break;
+            case 1:
+                result = R.string.tab1;
+                break;
+            case 2:
+                result = R.string.tab2;
+                break;
+            case 3:
+                result = R.string.tab3;
+                break;
+            case 4:
+                result = R.string.tab4;
+                break;
+            case 5:
+                result = R.string.qna;
                 break;
         }
         return result;
@@ -285,12 +310,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         toolbar_space = findViewById(R.id.tool_space);
         collapse_space = findViewById(R.id.expand_space);
         main_back = findViewById(R.id.main_imageview_placeholder);
+        expand_lbl = findViewById(R.id.expand_lbl);
     }
     private void handleToolbarTitleVisibility(float percentage) {
         if (percentage >= PERCENTAGE_TO_SHOW_TITLE_AT_TOOLBAR) {
 
             if(!mIsTheTitleVisible) {
                 startAlphaAnimation(mTitle, ALPHA_ANIMATIONS_DURATION, View.VISIBLE);
+                startAlphaAnimation(expand_lbl, ALPHA_ANIMATIONS_DURATION, View.INVISIBLE);
                 mIsTheTitleVisible = true;
             }
 
@@ -298,6 +325,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             if (mIsTheTitleVisible) {
                 startAlphaAnimation(mTitle, ALPHA_ANIMATIONS_DURATION, View.INVISIBLE);
+                startAlphaAnimation(expand_lbl, ALPHA_ANIMATIONS_DURATION, View.VISIBLE);
                 mIsTheTitleVisible = false;
             }
         }
@@ -675,13 +703,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-
         body = new String[]{"상체 운동", "상체 정보", "하체 운동", "하체 정보", "스트레칭"};
         follow = new String[]{"코어 운동", "유산소운동", "근력운동", "스트레칭 따라하기"};
         food = new String[]{"체지방감소", "근력강화", "근육량증대", "몸매관리", "대사증후군"};
         trainer = new String[]{"트레이너", "영양사"};
         license = new String[]{};
         Intent home = new Intent(MainActivity.this, FirstActivity.class);
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+        params.addRule(RelativeLayout.END_OF, R.id.btn_View);
+        params.addRule(RelativeLayout.ALIGN_TOP, R.id.btn_View);
+        params.addRule(RelativeLayout.ALIGN_BOTTOM, R.id.btn_View);
         switch (v.getId()) {
             case R.id.cancel_menuBtn:
                 mPopupWindow.dismiss();
@@ -693,6 +724,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.body_menuBtn:
                 viewPager.setCurrentItem(1, true);
                 menu_listSet(body);
+                params.setMargins(0,0,0,0);
+                menu_list.setLayoutParams(params);
                 body_menuBtn.setImageResource(R.drawable.menu_body_sel);
                 follow_menuBtn.setImageResource(R.drawable.menu_follow);
                 food_menuBtn.setImageResource(R.drawable.menu_food_sel);
@@ -706,6 +739,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.follow_menuBtn:
                 viewPager.setCurrentItem(2, true);
                 menu_listSet(follow);
+                params.setMargins(0,300,0,0);
+                menu_list.setLayoutParams(params);
                 follow_menuBtn.setImageResource(R.drawable.menu_follow_sel);
                 body_menuBtn.setImageResource(R.drawable.menu_body);
                 food_menuBtn.setImageResource(R.drawable.menu_food);
@@ -720,6 +755,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.food_menuBtn:
                 viewPager.setCurrentItem(3, true);
                 menu_listSet(food);
+                params.setMargins(0,600,0,0);
+                menu_list.setLayoutParams(params);
                 food_menuBtn.setImageResource(R.drawable.menu_food_sel);
                 body_menuBtn.setImageResource(R.drawable.menu_body);
                 follow_menuBtn.setImageResource(R.drawable.menu_follow);
@@ -738,6 +775,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.writer_menuBtn:
                 viewPager.setCurrentItem(4, true);
                 menu_listSet(trainer);
+                params.setMargins(0,1000,0,0);
+                menu_list.setLayoutParams(params);
                 writer_menuBtn.setImageResource(R.drawable.menu_writer_sel);
                 body_menuBtn.setImageResource(R.drawable.menu_body);
                 follow_menuBtn.setImageResource(R.drawable.menu_follow);
@@ -782,7 +821,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void popupshow(MenuItem item) {
         popupDisplay();
-        Log.d("MenuItemClick", String.valueOf(item.getItemId()));
     }
 }
 /** 상체 : 1, 하체 : 2

@@ -15,10 +15,11 @@
  -->
 <resources>
     <string name="app_name">ViewBody</string>
-    <string name="tab1">우리 몸에 대해서</string>
-    <string name="tab2">운동에 관해서</string>
-    <string name="tab3">나를 봐주세요</string>
-    <string name="tab4">어떤 음식이 좋을까?</string>
+    <string name="tab1">몸과 운동</string>
+    <string name="tab2">동영상 따라하기</string>
+    <string name="tab3">음식과 영양</string>
+    <string name="tab4">트레이너와 영양사</string>
+    <string name="tab5">금주의 자료</string>
     <string name="action_settings">Settings</string>
     <string name="menu_night_mode">Night mode</string>
     <string name="menu_night_mode_system">Follow system</string>
@@ -83,7 +84,7 @@
     <string name="food_muscleup">근육증가식단</string>
     <string name="food_metabolic">대사증후군 식단</string>
     <string name="account">계정</string>
-    <string name="qna">묻고답하기</string>
+    <string name="qna">묻고 답하기</string>
     <string name="qna_write">질문하기</string>
     <string name="selfmassage">자가마사지</string>
     <string name="follow">동영상 따라하기</string>

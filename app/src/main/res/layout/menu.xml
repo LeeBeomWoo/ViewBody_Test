@@ -224,6 +224,8 @@
                 android:layout_toEndOf="@+id/btn_View"
                 android:divider="@drawable/underline"
                 android:dividerHeight="5dp"
+                android:footerDividersEnabled="true"
+                android:headerDividersEnabled="true"
                 tools:ignore="NestedScrolling"
                 tools:listfooter="@drawable/underline"
                 tools:listitem="@layout/menulistitem" />
