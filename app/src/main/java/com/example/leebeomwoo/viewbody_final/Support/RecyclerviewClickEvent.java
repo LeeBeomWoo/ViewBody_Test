@@ -35,6 +35,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.leebeomwoo.viewbody_final.GestureImageView.GestureImageView;
 import com.example.leebeomwoo.viewbody_final.Item.ListDummyItem;
 import com.example.leebeomwoo.viewbody_final.R;
 import com.squareup.picasso.Picasso;
@@ -52,7 +53,8 @@ public class RecyclerviewClickEvent extends GestureDetector.SimpleOnGestureListe
     private static final String TAG = "Popup";
     private Context context;
     private int drawable ;
-    private ImageView imgViewIcon, titleimage;
+    private ImageView titleimage;
+    private GestureImageView imgViewIcon;
     private TextView video_title_1, video_title_2, video_title_3, txtViewTitle, txtViewId;
     private WebView imgViewFace, videoView_1, videoView_2, videoView_3;
     private ListDummyItem ldItem;
@@ -105,6 +107,7 @@ public class RecyclerviewClickEvent extends GestureDetector.SimpleOnGestureListe
         Dialog dialog = new Dialog(context);
         dialog.setContentView(R.layout.fragment_detail);
         ScrollView scroll = new ScrollView(context);
+        ScaleLinearLayout main = dialog.findViewById(R.id.detail_layout);
         dialog.getWindow().setLayout(width, height);
         //dialog.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
         txtViewTitle = dialog.findViewById(R.id.detile_Title);
@@ -115,7 +118,6 @@ public class RecyclerviewClickEvent extends GestureDetector.SimpleOnGestureListe
         viewGroup.removeView(card);
         scroll.addView(card);
         viewGroup.addView(scroll);
-        imgViewIcon = dialog.findViewById(R.id.detile_Image);
         video_title_1 = dialog.findViewById(R.id.video_title_1);
         video_title_2 = dialog.findViewById(R.id.video_title_2);
         video_title_3 = dialog.findViewById(R.id.video_title_3);
@@ -129,16 +131,20 @@ public class RecyclerviewClickEvent extends GestureDetector.SimpleOnGestureListe
         Picasso.with(context).load(titlecategory(ldItem.getLd_Category())).fit().into(titleimage);
         //titleimage.setImageDrawable(titlecategory(ldItem.getLd_Category()));
         String result = ldItem.getLd_ImageUrl().replaceAll("\\/","/");
+        imgViewIcon = new GestureImageView(context);
         Picasso.with(context).load(ConAdapter.SERVER_URL + result).resize(width, height).into(imgViewIcon);
         txtViewTitle.setText(ldItem.getLd_Title());
         txtViewId.setText(ldItem.getLd_Id());
         imgViewIcon.setLayoutParams(new ScaleLinearLayout.LayoutParams(ScaleLinearLayout.LayoutParams.MATCH_PARENT,
                 ScaleLinearLayout.LayoutParams.WRAP_CONTENT));
+        imgViewIcon.setMinScale(0.5f);
+        imgViewIcon.setMaxScale(10.0f);
         imgViewIcon.setFocusable(true);
         imgViewIcon.setOnTouchListener(this);
         imgViewIcon.setOnDragListener(this);
         imgViewIcon.setScaleType(ImageView.ScaleType.MATRIX);
         webviewSet(imgViewFace, null);
+        main.addView(imgViewIcon, 1);
         if(ldItem.getLd_Video() != null) {
             String[] animalsArray = ldItem.getLd_Video().split(",");
             for(int i = 0; i < animalsArray.length; i++) {
