@@ -254,12 +254,15 @@ public class GestureImageView extends android.support.v7.widget.AppCompatImageVi
 		switch(getScaleType()) {
 			case CENTER:
 				// Center the image in the view, but perform no scaling.
+				// 뷰를 이미지 가운데에 배치하지만 비율 조정은 수행하지 않습니다.
 				startingScale = 1.0f;
 				break;
 				
 			case CENTER_CROP:
 				// Scale the image uniformly (maintain the image's aspect ratio) so that both dimensions
 				// (width and height) of the image will be equal to or larger than the corresponding dimension of the view (minus padding).
+				// 이미지의 종횡비를 일정하게 유지 (이미지의 종횡비 유지)하여 두 치수
+				// (너비와 높이)는 뷰의 해당 치수 (패딩 빼기)보다 크거나 같을 것입니다.
 				startingScale = Math.max((float) measuredHeight / (float) imageHeight, (float) measuredWidth/ (float) imageWidth);
 				break;
 				
@@ -267,6 +270,8 @@ public class GestureImageView extends android.support.v7.widget.AppCompatImageVi
 
 				// Scale the image uniformly (maintain the image's aspect ratio) so that both dimensions
 				// (width and height) of the image will be equal to or less than the corresponding dimension of the view (minus padding).
+				// 이미지의 종횡비를 일정하게 유지 (이미지의 종횡비 유지)하여 두 치수
+				// (너비와 높이)는 뷰의 해당 치수 (패딩 빼기)보다 크거나 같을 것입니다.
 				float wRatio = (float) imageWidth / (float) measuredWidth;
 				float hRatio = (float) imageHeight / (float) measuredHeight;
 
