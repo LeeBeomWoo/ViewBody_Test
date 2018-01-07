@@ -16,7 +16,7 @@
         <android.support.design.widget.CollapsingToolbarLayout
             android:id="@+id/toolbar_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="220dp"
             android:fitsSystemWindows="true"
             app:contentScrim="?attr/colorPrimary"
             app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
@@ -25,7 +25,7 @@
             <ImageView
                 android:id="@+id/main.imageview.placeholder"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
+                android:layout_height="220dp"
                 android:scaleType="centerCrop"
                 android:tint="#11000000"
                 app:layout_collapseMode="parallax"
@@ -47,12 +47,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:paddingBottom="5dp">
 
                     <ImageView
                         android:id="@+id/expand_space"
-                        android:layout_width="140dp"
-                        android:layout_height="140dp"
+                        android:layout_width="110dp"
+                        android:layout_height="110dp"
                         android:layout_gravity="center_horizontal|center"
                         android:layout_margin="5dp"
                         android:gravity="center"
@@ -63,7 +64,6 @@
                         android:id="@+id/expand_lbl"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="10dp"
                         android:textAlignment="center"
                         android:textColor="@android:color/background_light"
                         android:textSize="30sp"
