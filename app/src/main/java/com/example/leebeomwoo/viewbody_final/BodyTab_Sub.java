@@ -2,6 +2,7 @@ package com.example.leebeomwoo.viewbody_final;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
@@ -111,6 +112,8 @@ public class BodyTab_Sub extends Fragment {
         }
         viewPager.setCurrentItem(i, true);
     }
+
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);

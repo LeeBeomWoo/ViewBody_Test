@@ -2,29 +2,29 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.leebeomwoo.viewbody_final">
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    //wifi 연결을 확인함
+    <!--wifi 연결을 확인함-->
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
-    //wifi 체인지를 확인함
+    <!--wifi 체인지를 확인함-->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    //네트웍이 연결된것을 확인할수 있게함
+    <!--네트웍이 연결된것을 확인할수 있게함-->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
-    // 인터넷을 사용함
+    <!-- 인터넷을 사용함-->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
-    <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
-
+    <!-- <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+     <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
+-->
     <uses-feature
         android:name="android.hardware.camera2.full"
         android:required="false" />
-    //카메라 사용
+    <!--카메라 사용-->
     <uses-feature
         android:name="android.hardware.camera.full"
         android:required="false" />
-    //카메라 사용
+    <!--카메라 사용-->
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />
@@ -61,7 +61,8 @@
             android:theme="@style/ViewBody"
             android:windowSoftInputMode="adjustPan"/>
         <activity android:name=".MainActivity"
-            android:theme="@style/ViewBody">
+            android:theme="@style/ViewBody"
+            android:configChanges="orientation|screenSize|keyboardHidden">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>

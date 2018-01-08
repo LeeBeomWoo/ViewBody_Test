@@ -1,43 +1,28 @@
 package com.example.leebeomwoo.viewbody_final;
 
-import android.animation.Animator;
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
+import android.content.res.Configuration;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.TabLayout;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.PopupMenu;
+import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
-import android.view.animation.AnimationSet;
-import android.view.animation.TranslateAnimation;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
@@ -47,7 +32,6 @@ import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
-import android.widget.Space;
 import android.widget.TextView;
 
 import com.example.leebeomwoo.viewbody_final.Adapter.LicenseListAdapter;
@@ -56,7 +40,6 @@ import com.example.leebeomwoo.viewbody_final.Adapter.TabsAdapter;
 import com.example.leebeomwoo.viewbody_final.Fragment.QnAFragment;
 import com.example.leebeomwoo.viewbody_final.Item.LicenseItem;
 import com.example.leebeomwoo.viewbody_final.Item.MainTabItem;
-import com.example.leebeomwoo.viewbody_final.Support.CenteringTabLayout;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
@@ -100,6 +83,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     Toolbar toolbar;
     AppBarLayout mAppBarLayout;
     ImageView toolbar_space, collapse_space, main_back;
+
+    String TAG = "Main_Activity";
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if(newConfig.orientation == Configuration.ORIENTATION_PORTRAIT){
+            Log.d(TAG + "_PORTRAIT", String.valueOf(toolbarLayout.getHeight()) + "*" + String.valueOf(toolbarLayout.getWidth()));
+            mTitleContainer.setOrientation(LinearLayout.VERTICAL);
+            ScaleLinearLayout.LayoutParams layoutParams = new ScaleLinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            layoutParams.gravity = Gravity.CENTER_HORIZONTAL;
+            layoutParams.setMargins(0,0,0,10);
+            expand_lbl.setLayoutParams(layoutParams);
+        }else if(newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE){
+            Log.d(TAG + "_Landscape", String.valueOf(toolbarLayout.getHeight()) + "*" + String.valueOf(toolbarLayout.getWidth()));
+            mTitleContainer.setOrientation(LinearLayout.HORIZONTAL);
+            ScaleLinearLayout.LayoutParams layoutParams = new ScaleLinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            layoutParams.gravity = Gravity.CENTER_VERTICAL;
+            layoutParams.setMargins(0,0,0,0);
+            expand_lbl.setLayoutParams(layoutParams);
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
