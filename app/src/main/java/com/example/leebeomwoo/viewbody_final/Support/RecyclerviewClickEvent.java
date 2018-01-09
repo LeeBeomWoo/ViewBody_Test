@@ -36,6 +36,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.leebeomwoo.viewbody_final.GestureImageView.GestureImageView;
+import com.example.leebeomwoo.viewbody_final.GestureImageView.GestureImageViewTouchListener;
 import com.example.leebeomwoo.viewbody_final.Item.ListDummyItem;
 import com.example.leebeomwoo.viewbody_final.R;
 import com.squareup.picasso.Picasso;
@@ -49,9 +50,9 @@ import cn.gavinliu.android.lib.scale.ScaleRelativeLayout;
  * Created by LeeBeomWoo on 2017-06-21.
  */
 
-public class RecyclerviewClickEvent extends GestureDetector.SimpleOnGestureListener implements View.OnTouchListener, View.OnDragListener {
+public class RecyclerviewClickEvent extends GestureDetector.SimpleOnGestureListener {
     private static final String TAG = "Popup";
-    private Context context;
+    private Context bcontext;
     private int drawable ;
     private ImageView titleimage;
     private GestureImageView imgViewIcon;
@@ -59,41 +60,14 @@ public class RecyclerviewClickEvent extends GestureDetector.SimpleOnGestureListe
     private WebView imgViewFace, videoView_1, videoView_2, videoView_3;
     private ListDummyItem ldItem;
     private CardView card;
-    boolean expanded = false;
 
     private int color, rusult, result, fin;
-    // These matrices will be used to move and zoom image
-    Matrix matrix = new Matrix();
-    Matrix savedMatrix = new Matrix();
-
-    // We can be in one of these 3 states
-    static final int NONE = 0;
-    static final int DRAG = 1;
-    static final int ZOOM = 2;
-    int mode = NONE;
-    private float dx, dy, tempx, tempy; // postTranslate X distance
-    private float[] matrixValues = new float[9];
-    float matrixX = 0; // X coordinate of matrix inside the ImageView
-    float matrixY = 0; // Y coordinate of matrix inside the ImageView
-    float width = 0; // width of drawable
-    float height = 0; // height of drawable
-
-    // Remember some things for zooming
-    PointF start = new PointF();
-    PointF mid = new PointF();
-    float oldDist = 1f;
-    private long thisTime = 0;
-    private long prevTime = 0;
-    private boolean firstTap = true;
-    protected static final long DOUBLE_CLICK_MAX_DELAY = 1000L;
 
     private final static String FURL = "<html><body><iframe width=\"1080\" height=\"720\" src=\"";
     private final static String BURL = "\" frameborder=\"0\" allowfullscreen></iframe></html></body>";
     private final static String CHANGE = "https://www.youtube.com/embed";
-    @SuppressLint("ClickableViewAccessibility")
     public void Click(ListDummyItem ld_Item, Context context){
-
-        this.context = context;
+        this.bcontext = context;
         ldItem = ld_Item;
         WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         DisplayMetrics metrics = new DisplayMetrics();
@@ -106,18 +80,18 @@ public class RecyclerviewClickEvent extends GestureDetector.SimpleOnGestureListe
         Log.d(TAG, ldItem.getLd_ImageUrl());
         Dialog dialog = new Dialog(context);
         dialog.setContentView(R.layout.fragment_detail);
-        ScrollView scroll = new ScrollView(context);
+        //ScrollView scroll = new ScrollView(context);
         ScaleLinearLayout main = dialog.findViewById(R.id.detail_layout);
         dialog.getWindow().setLayout(width, height);
         //dialog.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
         txtViewTitle = dialog.findViewById(R.id.detile_Title);
-        scroll.setLayoutParams(new WindowManager.LayoutParams(WindowManager.LayoutParams.MATCH_PARENT,
-                WindowManager.LayoutParams.MATCH_PARENT));
+        //scroll.setLayoutParams(new WindowManager.LayoutParams(WindowManager.LayoutParams.MATCH_PARENT,
+               // WindowManager.LayoutParams.MATCH_PARENT));
         card = dialog.findViewById(R.id.cardView);
-        ViewGroup viewGroup = ((ViewGroup)card.getParent());
-        viewGroup.removeView(card);
-        scroll.addView(card);
-        viewGroup.addView(scroll);
+       // ViewGroup viewGroup = ((ViewGroup)card.getParent());
+        //viewGroup.removeView(card);
+        //scroll.addView(card);
+        //viewGroup.addView(scroll);
         video_title_1 = dialog.findViewById(R.id.video_title_1);
         video_title_2 = dialog.findViewById(R.id.video_title_2);
         video_title_3 = dialog.findViewById(R.id.video_title_3);
@@ -137,11 +111,10 @@ public class RecyclerviewClickEvent extends GestureDetector.SimpleOnGestureListe
         txtViewId.setText(ldItem.getLd_Id());
         imgViewIcon.setLayoutParams(new ScaleLinearLayout.LayoutParams(ScaleLinearLayout.LayoutParams.MATCH_PARENT,
                 ScaleLinearLayout.LayoutParams.WRAP_CONTENT));
-        imgViewIcon.setMinScale(0.5f);
         imgViewIcon.setMaxScale(10.0f);
+        imgViewIcon.setMinScale(1.0f);
+        imgViewIcon.setOnTouchListener(new GestureImageViewTouchListener(imgViewIcon, width, height));
         imgViewIcon.setFocusable(true);
-        imgViewIcon.setOnTouchListener(this);
-        imgViewIcon.setOnDragListener(this);
         imgViewIcon.setScaleType(ImageView.ScaleType.MATRIX);
         webviewSet(imgViewFace, null);
         main.addView(imgViewIcon, 1);
@@ -745,207 +718,5 @@ public class RecyclerviewClickEvent extends GestureDetector.SimpleOnGestureListe
         return fin;
     }
 
-    @Override
-    public boolean onTouch(View v, MotionEvent event) {
-        ImageView view = (ImageView) v;
-        dumpEvent(event);
-        // Handle touch events here...
-        switch (event.getAction() & MotionEvent.ACTION_MASK) {
-            case MotionEvent.ACTION_DOWN:
-                savedMatrix.set(matrix);
-                start.set(event.getX(), event.getY());
-                Log.d(TAG, "mode=DRAG");
-                mode = DRAG;
-                break;
-            case MotionEvent.ACTION_POINTER_DOWN:
-                oldDist = spacing(event);
-                Log.d(TAG, "oldDist=" + oldDist);
-                if (oldDist > 10f) {
-                    savedMatrix.set(matrix);
-                    midPoint(mid, event);
-                    mode = ZOOM;
-                    Log.d(TAG, "mode=ZOOM");
-                }
-                break;
-            case MotionEvent.ACTION_UP:
-            case MotionEvent.ACTION_POINTER_UP:
-                mode = NONE;
-                Log.d(TAG, "mode=NONE");
-                break;
-            case MotionEvent.ACTION_MOVE:
-                if (mode == DRAG) {
-                    matrix.set(savedMatrix);
-                    matrix.getValues(matrixValues);
-                    matrixX = matrixValues[2];
-                    matrixY = matrixValues[5];
-                    width = matrixValues[0] * ((view).getDrawable()
-                            .getIntrinsicWidth());
-                    height = matrixValues[4] * ((view).getDrawable()
-                            .getIntrinsicHeight());
-                    dx = event.getX() - start.x;
-                    dy = event.getY() - start.y;
-                    if(tempx - event.getX() > 0) {// mouse moving left
-                        Log.d("moving bound", "왼쪽 이동");
-                    }else {// mouse moving right
-                        Log.d("moving bound", "오른쪽 이동");
-                    }
-                    tempx = event.getX();
-                    tempy = event.getY();
-                    //if image will go outside left bound
-                    if (matrixX + dx >= 0){
-                        Log.d("left bound", String.valueOf(matrixX + dx));
-                        dx = -matrixX;
-                    }
-                    //if image will go outside right bound
-                    if(matrixX + dx + width <= view.getWidth()){
-                        Log.d("right bound", String.valueOf(matrixX + dx+ width)+ "*" + String.valueOf(view.getWidth()));
-                        dx = view.getWidth() - matrixX - width;
-                    }
 
-                    Log.d("dx bound", String.valueOf(dx));
-                    matrix.postTranslate(dx, dy);
-                } else if (mode == ZOOM) {
-                    float newDist = spacing(event);
-                    Log.d(TAG, "newDist=" + newDist);
-                    if (newDist > 10f) {
-                        matrix.set(savedMatrix);
-                        float scale = newDist / oldDist;
-                        matrix.postScale(scale, scale, mid.x, mid.y);
-                    }
-                }
-                break;
-        }
-        ScaleLinearLayout.LayoutParams layout = new ScaleLinearLayout.LayoutParams(ScaleLinearLayout.LayoutParams.WRAP_CONTENT, ScaleLinearLayout.LayoutParams.WRAP_CONTENT);
-        view.setLayoutParams(layout);
-        view.setImageMatrix(matrix);
-        return true;
-    }
-    private void dumpEvent(MotionEvent event) {
-        String names[] = { "DOWN", "UP", "MOVE", "CANCEL", "OUTSIDE",
-                "POINTER_DOWN", "POINTER_UP", "7?", "8?", "9?" };
-        StringBuilder sb = new StringBuilder();
-        int action = event.getAction();
-        int actionCode = action & MotionEvent.ACTION_MASK;
-        sb.append("event ACTION_").append(names[actionCode]);
-        if (actionCode == MotionEvent.ACTION_POINTER_DOWN
-                || actionCode == MotionEvent.ACTION_POINTER_UP) {
-            sb.append("(pid ").append(
-                    action >> MotionEvent.ACTION_POINTER_ID_SHIFT);
-            sb.append(")");
-        }
-        sb.append("[");
-        for (int i = 0; i < event.getPointerCount(); i++) {
-            sb.append("#").append(i);
-            sb.append("(pid ").append(event.getPointerId(i));
-            sb.append(")=").append((int) event.getX(i));
-            sb.append(",").append((int) event.getY(i));
-            if (i + 1 < event.getPointerCount())
-                sb.append(";");
-        }
-        sb.append("]");
-        Log.d(TAG, sb.toString());
-    }
-
-    /** Determine the space between the first two fingers */
-    private float spacing(MotionEvent event) {
-        float x = event.getX(0) - event.getX(1);
-        float y = event.getY(0) - event.getY(1);
-        return (x * x + y * y);
-    }
-
-    /** Calculate the mid point of the first two fingers */
-    private void midPoint(PointF point, MotionEvent event) {
-        float x = event.getX(0) + event.getX(1);
-        float y = event.getY(0) + event.getY(1);
-        point.set(x / 2, y / 2);
-    }
-
-    @Override
-    public boolean onDrag(View v, DragEvent event) {
-        final int action = event.getAction();
-        switch (action){
-            case DragEvent.ACTION_DRAG_STARTED:
-
-                // Determines if this View can accept the dragged data
-                if (event.getClipDescription().hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN)) {
-
-                    // As an example of what your application might do,
-                    // applies a blue color tint to the View to indicate that it can accept
-                    // data.
-                    v.setBackgroundColor(Color.BLUE);
-
-                    // Invalidate the view to force a redraw in the new tint
-                    v.invalidate();
-
-                    // returns true to indicate that the View can accept the dragged data.
-                    return true;
-
-                }
-
-                // Returns false. During the current drag and drop operation, this View will
-                // not receive events again until ACTION_DRAG_ENDED is sent.
-                return false;
-
-            case DragEvent.ACTION_DRAG_ENTERED:
-
-                // Applies a green tint to the View. Return true; the return value is ignored.
-
-                v.setBackgroundColor(Color.GREEN);
-
-                // Invalidate the view to force a redraw in the new tint
-                v.invalidate();
-
-                return true;
-
-            case DragEvent.ACTION_DRAG_LOCATION:
-
-                // Ignore the event
-                return true;
-
-            case DragEvent.ACTION_DRAG_EXITED:
-
-                // Re-sets the color tint to blue. Returns true; the return value is ignored.
-                v.setBackgroundColor(Color.BLUE);
-
-                // Invalidate the view to force a redraw in the new tint
-                v.invalidate();
-
-                return true;
-
-            case DragEvent.ACTION_DROP:
-
-                // Gets the item containing the dragged data
-                ClipData.Item item = event.getClipData().getItemAt(0);
-
-
-                // Invalidates the view to force a redraw
-                v.invalidate();
-
-                // Returns true. DragEvent.getResult() will return true.
-                return true;
-
-            case DragEvent.ACTION_DRAG_ENDED:
-
-                // Invalidates the view to force a redraw
-                v.invalidate();
-
-                // Does a getResult(), and displays what happened.
-                if (event.getResult()) {
-                    Toast.makeText(context, "The drop was handled.", Toast.LENGTH_LONG);
-
-                } else {
-                    Toast.makeText(context, "The drop didn't work.", Toast.LENGTH_LONG);
-
-                }
-
-                // returns true; the value is ignored.
-                return true;
-
-            // An unknown action type was received.
-            default:
-                Log.e("DragDrop Example","Unknown action type received by OnDragListener.");
-                break;
-        }
-        return false;
-    }
 }

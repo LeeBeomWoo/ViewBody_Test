@@ -15,6 +15,8 @@
  */
 package com.example.leebeomwoo.viewbody_final.GestureImageView;
 
+import android.util.Log;
+
 /**
  * @author Jason Polites
  *
@@ -44,7 +46,6 @@ public class FlingAnimation implements Animation {
 		velocityY *= factor;
 		
 		boolean active = (Math.abs(velocityX) > threshold && Math.abs(velocityY) > threshold);
-		
 		if(listener != null) {
 			listener.onMove(dx, dy);
 			

@@ -16,6 +16,8 @@
 package com.example.leebeomwoo.viewbody_final.GestureImageView;
 
 
+import android.util.Log;
+
 /**
  * @author Jason Polites
  *

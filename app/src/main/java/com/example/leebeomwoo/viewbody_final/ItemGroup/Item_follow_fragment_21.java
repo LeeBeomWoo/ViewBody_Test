@@ -55,6 +55,7 @@ import android.util.SparseIntArray;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.OrientationEventListener;
 import android.view.Surface;
 import android.view.TextureView;
@@ -137,7 +138,7 @@ public class Item_follow_fragment_21 extends Fragment
     SeekBar seekBar;
     private static final String[] VIDEO_PERMISSIONS = {
             Manifest.permission.CAMERA,
-            Manifest.permission.RECORD_AUDIO,
+            Manifest.permission.RECORD_AUDIO
     };
     private static final String[] FILE_ACCESSPERMISSIONS = {
             Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -569,11 +570,11 @@ public class Item_follow_fragment_21 extends Fragment
         bTnLayout = (ScaleRelativeLayout) view.findViewById(R.id.button_layout);
         cameraLayout = (ScaleFrameLayout) view.findViewById(R.id.video_layout);
         main = (ScaleRelativeLayout) view.findViewById(R.id.item_mainLayout);
-        record.setOnClickListener(new View.OnClickListener() {
+        record.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public void onClick(View v) {
+            public boolean onTouch(View v, MotionEvent event) {
                 if (mTextureView.getVisibility() == View.INVISIBLE) {
-                    mTextureView.setVisibility(View.VISIBLE);
+                mTextureView.setVisibility(View.VISIBLE);
                 } else {
                     if (mTextureView != null) {
                         if (mIsRecordingVideo) {
@@ -587,11 +588,12 @@ public class Item_follow_fragment_21 extends Fragment
                         }
                     }
                 }
+                return false;
             }
         });
-        load.setOnClickListener(new View.OnClickListener() {
+        load.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public void onClick(View v) {
+            public boolean onTouch(View v, MotionEvent event) {
                 Log.d(TAG, "load click");
                 videoString = null;
                 videopath = null;
@@ -599,11 +601,12 @@ public class Item_follow_fragment_21 extends Fragment
                 intent.setType("video/mp4");
                 intent.setAction(Intent.ACTION_GET_CONTENT);
                 startActivityForResult(Intent.createChooser(intent, "Select Video"), SELECT_MOVIE);
+                return false;
             }
         });
-        play.setOnClickListener(new View.OnClickListener() {
+        play.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public void onClick(View v) {
+            public boolean onTouch(View v, MotionEvent event) {
                 if(videoView.isPlaying()){
                     videoView.pause();
                     play.setImageResource(R.drawable.play);
@@ -613,11 +616,12 @@ public class Item_follow_fragment_21 extends Fragment
                     mTextureView.setVisibility(View.INVISIBLE);
                     videoView.setVisibility(View.VISIBLE);
                 }
+                return false;
             }
         });
-        play_recordBtn.setOnClickListener(new View.OnClickListener() {
+        play_recordBtn.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public void onClick(View v) {
+            public boolean onTouch(View v, MotionEvent event) {
                 if(play_record){
                     if(mIsRecordingVideo){
                         stopRecordingVideo();
@@ -642,12 +646,14 @@ public class Item_follow_fragment_21 extends Fragment
                     play_record = true;
                 }
                 ButtonImageSetUp();
+                return false;
             }
         });
-        camerachange.setOnClickListener(new View.OnClickListener() {
+        camerachange.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public void onClick(View v) {
+            public boolean onTouch(View v, MotionEvent event) {
                 switchCamera();
+                return false;
             }
         });
     }
@@ -806,6 +812,13 @@ public class Item_follow_fragment_21 extends Fragment
      * Requests permissions needed for recording video.
      */
     private void requestVideoPermissions() {
+        if (shouldShowRequestPermissionRationale(VIDEO_PERMISSIONS)) {
+            new ConfirmationDialog().show(getActivity().getSupportFragmentManager(), FRAGMENT_DIALOG);
+        } else {
+            ActivityCompat.requestPermissions(getActivity(), VIDEO_PERMISSIONS, REQUEST_VIDEO_PERMISSIONS);
+        }
+    }
+    private void requestAudioPermissions() {
         if (shouldShowRequestPermissionRationale(VIDEO_PERMISSIONS)) {
             new ConfirmationDialog().show(getActivity().getSupportFragmentManager(), FRAGMENT_DIALOG);
         } else {
@@ -1087,9 +1100,22 @@ public class Item_follow_fragment_21 extends Fragment
     }
 
     private String getVideoFilePath(Context context) {
-        return Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_MOVIES).getPath() + "/"
-                + "ViewBody_" +System.currentTimeMillis() + ".mp4";
+        Boolean isSDPresent = android.os.Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED);
+        Boolean isSDSupportedDevice = Environment.isExternalStorageRemovable();
+
+        if(isSDSupportedDevice && isSDPresent)
+        {
+            // yes SD-card is present
+            return Environment.getExternalStorageDirectory() + "/"
+                    + "ViewBody_" +System.currentTimeMillis() + ".mp4";
+        }
+        else
+        {
+            // Sorry
+            return
+                    Environment.DIRECTORY_PICTURES + "/"
+                    + "ViewBody_" +System.currentTimeMillis() + ".mp4";
+        }
     }
 
     public void startRecordingVideo() {

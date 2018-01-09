@@ -17,6 +17,7 @@ package com.example.leebeomwoo.viewbody_final.GestureImageView;
 
 import android.content.res.Configuration;
 import android.graphics.PointF;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.MotionEvent;
@@ -94,7 +95,7 @@ public class GestureImageViewTouchListener implements OnTouchListener {
 		
 		this.imageWidth = image.getImageWidth();
 		this.imageHeight = image.getImageHeight();
-		
+		Log.d("displayHeight", String.valueOf(imageHeight));
 		startingScale = image.getScale();
 		
 		currentScale = startingScale;
@@ -371,7 +372,7 @@ public class GestureImageViewTouchListener implements OnTouchListener {
 		}
 		
 		boundCoordinates();
-		
+		Log.d("boundary", "handleUp");
 		if(!canDragX && !canDragY) {
 			
 			if(image.isLandscape()) {
@@ -429,9 +430,13 @@ public class GestureImageViewTouchListener implements OnTouchListener {
 		
 		float diffX = (current.x - last.x);
 		float diffY = (current.y - last.y);
+		Log.d("boundary_x", String.valueOf(current.x) + "*" + String.valueOf(last.x) + "*" + String.valueOf(diffX));
+		Log.d("boundary_y", String.valueOf(current.y) + "*" + String.valueOf(last.y) + "*" + String.valueOf(diffY));
+		Log.d("boundary_diff", String.valueOf(diffX) + "*" + String.valueOf(diffY) );
 		
-		if(diffX != 0 || diffY != 0) {
-			
+		if(diffY != 0 || diffX != 0) {
+			Log.d("boundary_diff", String.valueOf(next.x) + "*" + String.valueOf(next.y));
+
 			if(canDragX) next.x += diffX;
 			if(canDragY) next.y += diffY;
 			
@@ -442,6 +447,7 @@ public class GestureImageViewTouchListener implements OnTouchListener {
 			
 			if(canDragX || canDragY) {
 				image.setPosition(next.x, next.y);
+				Log.d("boundary_canDrag", String.valueOf(next.x) + "*" + String.valueOf(next.y));
 				
 				if(imageListener != null) {
 					imageListener.onPosition(next.x, next.y);
@@ -450,7 +456,6 @@ public class GestureImageViewTouchListener implements OnTouchListener {
 				return true;
 			}
 		}
-		
 		return false;
 	}
 	
@@ -524,7 +529,6 @@ public class GestureImageViewTouchListener implements OnTouchListener {
 		
 		canDragX = effectiveWidth > displayWidth;
 		canDragY = effectiveHeight > displayHeight;
-		
 		if(canDragX) {
 			float diff = (float)(effectiveWidth - displayWidth) / 2.0f;
 			boundaryLeft = centerX - diff;
@@ -535,6 +539,8 @@ public class GestureImageViewTouchListener implements OnTouchListener {
 			float diff = (float)(effectiveHeight - displayHeight) / 2.0f;
 			boundaryTop = centerY - diff;
 			boundaryBottom = centerY + diff;
+			Log.d("can_boundary", String.valueOf(boundaryTop) + "*" + String.valueOf(boundaryBottom));
+			Log.d("can_diff", String.valueOf(effectiveHeight) + "*" + String.valueOf(displayHeight));
 		}
 	}
 }
