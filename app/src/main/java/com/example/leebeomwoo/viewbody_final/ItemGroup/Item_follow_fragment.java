@@ -691,7 +691,7 @@ public class Item_follow_fragment extends Fragment implements Camera.PreviewCall
         mMediaRecorder.setCamera(mCamera);
 
         // Step 2: Set sources
-        mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC );
+        mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER );
         mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
 
         // Step 3: Set a CamcorderProfile (requires API Level 8 or higher)

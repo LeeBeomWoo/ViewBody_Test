@@ -120,6 +120,7 @@ public class Item_follow_fragment_21 extends Fragment
     private static final int REQUEST_CODE = 6384; // onActivityResult request
     private static final String TAG = "Item_follow_fragment_21";
     private static final int REQUEST_VIDEO_PERMISSIONS = 1;
+    private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
     private static final String FRAGMENT_DIALOG = "dialog";
     //ScaleRelativeLayout bTnLayout;
     //ScaleFrameLayout cameraLayout;
@@ -138,9 +139,7 @@ public class Item_follow_fragment_21 extends Fragment
     SeekBar seekBar;
     private static final String[] VIDEO_PERMISSIONS = {
             Manifest.permission.CAMERA,
-            Manifest.permission.RECORD_AUDIO
-    };
-    private static final String[] FILE_ACCESSPERMISSIONS = {
+            Manifest.permission.RECORD_AUDIO,
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE
     };
@@ -519,9 +518,6 @@ public class Item_follow_fragment_21 extends Fragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView");
-        if (!hasPermissionsGranted(FILE_ACCESSPERMISSIONS)) {
-            requestFilePermissions();
-        }
         if (!hasPermissionsGranted(VIDEO_PERMISSIONS)) {
             requestVideoPermissions();
         }
@@ -575,17 +571,16 @@ public class Item_follow_fragment_21 extends Fragment
             public boolean onTouch(View v, MotionEvent event) {
                 if (mTextureView.getVisibility() == View.INVISIBLE) {
                 mTextureView.setVisibility(View.VISIBLE);
-                } else {
-                    if (mTextureView != null) {
-                        if (mIsRecordingVideo) {
-                            stopRecordingVideo();
-                            record.setImageResource(R.drawable.record);
-                        } else {
-                            videoView.setVisibility(View.INVISIBLE);
-                            mTextureView.setVisibility(View.VISIBLE);
-                            record.setImageResource(R.drawable.stop);
-                            startRecordingVideo();
-                        }
+                }
+                if (mTextureView != null) {
+                    if (mIsRecordingVideo) {
+                        stopRecordingVideo();
+                        record.setImageResource(R.drawable.record);
+                    } else {
+                        videoView.setVisibility(View.INVISIBLE);
+                        mTextureView.setVisibility(View.VISIBLE);
+                        record.setImageResource(R.drawable.stop);
+                        startRecordingVideo();
                     }
                 }
                 return false;
@@ -626,7 +621,6 @@ public class Item_follow_fragment_21 extends Fragment
                     if(mIsRecordingVideo){
                         stopRecordingVideo();
                     }
-                    closePreviewSession();
                     closeCamera();
                     mTextureView.setVisibility(View.INVISIBLE);
                     videoView.setVisibility(View.VISIBLE);
@@ -818,22 +812,6 @@ public class Item_follow_fragment_21 extends Fragment
             ActivityCompat.requestPermissions(getActivity(), VIDEO_PERMISSIONS, REQUEST_VIDEO_PERMISSIONS);
         }
     }
-    private void requestAudioPermissions() {
-        if (shouldShowRequestPermissionRationale(VIDEO_PERMISSIONS)) {
-            new ConfirmationDialog().show(getActivity().getSupportFragmentManager(), FRAGMENT_DIALOG);
-        } else {
-            ActivityCompat.requestPermissions(getActivity(), VIDEO_PERMISSIONS, REQUEST_VIDEO_PERMISSIONS);
-        }
-    }
-
-    private void requestFilePermissions(){
-        if (shouldShowRequestPermissionRationale(FILE_ACCESSPERMISSIONS)) {
-            new ConfirmationDialog().show(getActivity().getSupportFragmentManager(), FRAGMENT_DIALOG);
-        } else {
-            ActivityCompat.requestPermissions(getActivity(), FILE_ACCESSPERMISSIONS, REQUEST_VIDEO_PERMISSIONS);
-        }
-    }
-
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
@@ -849,22 +827,6 @@ public class Item_follow_fragment_21 extends Fragment
                 }
             } else {
                 ErrorDialog.newInstance(getString(R.string.permission_request_camera))
-                        .show(getChildFragmentManager(), FRAGMENT_DIALOG);
-            }
-        } else {
-            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        }
-        if (requestCode == REQUEST_VIDEO_PERMISSIONS) {
-            if (grantResults.length == FILE_ACCESSPERMISSIONS.length) {
-                for (int result : grantResults) {
-                    if (result != PackageManager.PERMISSION_GRANTED) {
-                        ErrorDialog.newInstance(getString(R.string.permission_request_file))
-                                .show(getChildFragmentManager(), FRAGMENT_DIALOG);
-                        break;
-                    }
-                }
-            } else {
-                ErrorDialog.newInstance(getString(R.string.permission_request_file))
                         .show(getChildFragmentManager(), FRAGMENT_DIALOG);
             }
         } else {
@@ -913,13 +875,6 @@ public class Item_follow_fragment_21 extends Fragment
             mVideoSize = chooseVideoSize(map.getOutputSizes(MediaRecorder.class));
             mPreviewSize = chooseOptimalSize(map.getOutputSizes(SurfaceTexture.class),
                     width, height, mVideoSize);
-/**
-            int orientation = getResources().getConfiguration().orientation;
-            if (orientation == ORIENTATION_LANDSCAPE) {
-                mTextureView.setAspectRatio(mPreviewSize.getWidth(), mPreviewSize.getHeight());
-            } else {
-                mTextureView.setAspectRatio(mPreviewSize.getHeight(), mPreviewSize.getWidth());
-            }**/
             configureTransform(width, height);
             mMediaRecorder = new MediaRecorder();
             if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
@@ -985,13 +940,13 @@ public class Item_follow_fragment_21 extends Fragment
             mCameraDevice.createCaptureSession(Arrays.asList(previewSurface), new CameraCaptureSession.StateCallback() {
 
                 @Override
-                public void onConfigured(CameraCaptureSession cameraCaptureSession) {
+                public void onConfigured(@NonNull CameraCaptureSession cameraCaptureSession) {
                     mPreviewSession = cameraCaptureSession;
                     updatePreview();
                 }
 
                 @Override
-                public void onConfigureFailed(CameraCaptureSession cameraCaptureSession) {
+                public void onConfigureFailed(@NonNull CameraCaptureSession cameraCaptureSession) {
                     Activity activity = getActivity();
                     if (null != activity) {
                         Toast.makeText(activity, "Failed", Toast.LENGTH_SHORT).show();
@@ -1015,6 +970,7 @@ public class Item_follow_fragment_21 extends Fragment
             HandlerThread thread = new HandlerThread("CameraPreview");
             thread.start();
             mPreviewSession.setRepeatingRequest(mPreviewBuilder.build(), null, mBackgroundHandler);
+
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
@@ -1098,7 +1054,6 @@ public class Item_follow_fragment_21 extends Fragment
         }
         mMediaRecorder.prepare();
     }
-
     private String getVideoFilePath(Context context) {
         Boolean isSDPresent = android.os.Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED);
         Boolean isSDSupportedDevice = Environment.isExternalStorageRemovable();
@@ -1123,6 +1078,7 @@ public class Item_follow_fragment_21 extends Fragment
             return;
         }
         try {
+            Log.d("Video_", "Start");
             closePreviewSession();
             setUpMediaRecorder();
             SurfaceTexture texture = mTextureView.getSurfaceTexture();
@@ -1137,9 +1093,9 @@ public class Item_follow_fragment_21 extends Fragment
             mPreviewBuilder.addTarget(previewSurface);
 
             // Set up Surface for the MediaRecorder
-            mRecorderSurface = mMediaRecorder.getSurface();
-            surfaces.add(mRecorderSurface);
-            mPreviewBuilder.addTarget(mRecorderSurface);
+            Surface recorderSurface = mMediaRecorder.getSurface();
+            surfaces.add(recorderSurface);
+            mPreviewBuilder.addTarget(recorderSurface);
 
             // Start a capture session
             // Once the session starts, we can update the UI and start recording
@@ -1169,9 +1125,7 @@ public class Item_follow_fragment_21 extends Fragment
                     }
                 }
             }, mBackgroundHandler);
-        } catch (CameraAccessException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (CameraAccessException | IOException e) {
             e.printStackTrace();
         }
 
@@ -1190,7 +1144,7 @@ public class Item_follow_fragment_21 extends Fragment
         // Stop recording
         mMediaRecorder.stop();
         mMediaRecorder.reset();
-        CameraHelper.getOutputMediaFile(2);
+        // CameraHelper.getOutputMediaFile(2);
 
         Activity activity = getActivity();
         if (null != activity) {
@@ -1198,6 +1152,7 @@ public class Item_follow_fragment_21 extends Fragment
                     Toast.LENGTH_SHORT).show();
             Log.d(TAG, "Video saved: " + mNextVideoAbsolutePath);
         }
+        Log.d("Video_", "Stop");
         mNextVideoAbsolutePath = null;
         startPreview();
     }
