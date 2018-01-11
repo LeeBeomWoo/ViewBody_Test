@@ -437,6 +437,9 @@ public class Item_follow_fragment_21 extends Fragment implements FragmentCompat.
         webView.setZ((float)2);
         cameraLayout.setZ((float)0);
         mTextureView.setZ((float)0);
+        videoView.setLayoutParams(new ScaleFrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        mTextureView.setLayoutParams(new ScaleFrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        videoView.setZ((float)1);
     }
     private void PortrainSet(){
         LandWebView = new ScaleRelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, getResources().getDimensionPixelSize(R.dimen.videoviewSiz_item));
@@ -475,6 +478,8 @@ public class Item_follow_fragment_21 extends Fragment implements FragmentCompat.
         LandCamera.addRule(ScaleRelativeLayout.ABOVE, R.id.web_movie);
         cameraLayout.setLayoutParams(LandCamera);
         seekBar.setVisibility(View.GONE);
+        videoView.setLayoutParams(new ScaleFrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        mTextureView.setLayoutParams(new ScaleFrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         webView.setAlpha((float)1);
     }
     @SuppressLint("SetJavaScriptEnabled")
