@@ -41,7 +41,6 @@ import android.util.Size;
 import android.util.SparseIntArray;
 import android.view.Display;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
