@@ -5,22 +5,15 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Dialog;
-import android.bluetooth.BluetoothClass;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.graphics.Point;
 import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
-import android.graphics.drawable.BitmapDrawable;
-import android.hardware.SensorManager;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraCharacteristics;
@@ -31,59 +24,41 @@ import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
-import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.provider.MediaStore;
-import android.provider.Settings;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v13.app.ActivityCompat;
 import android.support.v13.app.FragmentCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
-import android.text.Layout;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
 import android.view.Display;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
-import android.view.OrientationEventListener;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.AdapterView;
-import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
-import android.widget.ListView;
-import android.widget.MediaController;
-import android.widget.PopupWindow;
-import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.Toast;
 import android.widget.VideoView;
 
-import com.example.leebeomwoo.viewbody_final.Adapter.StableArrayAdapter;
 import com.example.leebeomwoo.viewbody_final.CameraUse.AutoFitTextureView;
-import com.example.leebeomwoo.viewbody_final.CameraUse.CameraHelper;
-import com.example.leebeomwoo.viewbody_final.ItemViewActivity;
 import com.example.leebeomwoo.viewbody_final.R;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -95,7 +70,6 @@ import java.util.concurrent.TimeUnit;
 
 import cn.gavinliu.android.lib.scale.ScaleFrameLayout;
 import cn.gavinliu.android.lib.scale.ScaleRelativeLayout;
-import cn.gavinliu.android.lib.scale.helper.ScaleLayoutHelper;
 
 import static android.content.res.Configuration.ORIENTATION_PORTRAIT;
 
@@ -105,8 +79,7 @@ import static android.content.res.Configuration.ORIENTATION_PORTRAIT;
  */
 
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-public class Item_follow_fragment_21 extends Fragment
-        implements FragmentCompat.OnRequestPermissionsResultCallback {
+public class Item_follow_fragment_21 extends Fragment implements FragmentCompat.OnRequestPermissionsResultCallback, View.OnClickListener{
     private static final int SENSOR_ORIENTATION_DEFAULT_DEGREES = 90;
     private static final int SENSOR_ORIENTATION_INVERSE_DEGREES = 270;
     private static final SparseIntArray DEFAULT_ORIENTATIONS = new SparseIntArray();
@@ -115,12 +88,8 @@ public class Item_follow_fragment_21 extends Fragment
     private final static String FURL = "<html><body><iframe width=\"1280\" height=\"720\" src=\"";
     private final static String BURL = "\" frameborder=\"0\" allowfullscreen></iframe></html></body>";
     private final static String CHANGE = "https://www.youtube.com/embed";
-    private final int SELECT_MOVIE = 2;
-    private OrientationEventListener mOrientationListener;
-    private static final int REQUEST_CODE = 6384; // onActivityResult request
     private static final String TAG = "Item_follow_fragment_21";
     private static final int REQUEST_VIDEO_PERMISSIONS = 1;
-    private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
     private static final String FRAGMENT_DIALOG = "dialog";
     //ScaleRelativeLayout bTnLayout;
     //ScaleFrameLayout cameraLayout;
@@ -133,7 +102,6 @@ public class Item_follow_fragment_21 extends Fragment
     public static final String CAMERA_BACK = "0";
     public String change, temp, videoString;
     public Uri videopath;
-    public int videoPosition, orgPreviewWidth, orgPreviewHeight;
     private String cameraId = CAMERA_FRONT;
     public VideoView videoView;
     SeekBar seekBar;
@@ -227,8 +195,7 @@ public class Item_follow_fragment_21 extends Fragment
     /**
      * MediaRecorder
      */
-    private MediaRecorder mMediaRecorder;
-    private MediaController mMediaController;
+    private static MediaRecorder mMediaRecorder;
     /**
      * Whether the app is recording video now
      */
@@ -255,7 +222,7 @@ public class Item_follow_fragment_21 extends Fragment
     private CameraDevice.StateCallback mStateCallback = new CameraDevice.StateCallback() {
 
         @Override
-        public void onOpened(CameraDevice cameraDevice) {
+        public void onOpened(@NonNull CameraDevice cameraDevice) {
             mCameraDevice = cameraDevice;
             startPreview();
             mCameraOpenCloseLock.release();
@@ -265,14 +232,14 @@ public class Item_follow_fragment_21 extends Fragment
         }
 
         @Override
-        public void onDisconnected(CameraDevice cameraDevice) {
+        public void onDisconnected(@NonNull CameraDevice cameraDevice) {
             mCameraOpenCloseLock.release();
             cameraDevice.close();
             mCameraDevice = null;
         }
 
         @Override
-        public void onError(CameraDevice cameraDevice, int error) {
+        public void onError(@NonNull CameraDevice cameraDevice, int error) {
             mCameraOpenCloseLock.release();
             cameraDevice.close();
             mCameraDevice = null;
@@ -286,7 +253,6 @@ public class Item_follow_fragment_21 extends Fragment
     private Integer mSensorOrientation;
     private String mNextVideoAbsolutePath;
     private CaptureRequest.Builder mPreviewBuilder;
-    private Surface mRecorderSurface;
     public static Item_follow_fragment_21 newInstance(String tr_id, String imageUrl, int section) {
         Item_follow_fragment_21 item_follow_fragment_21 = new Item_follow_fragment_21();
         Bundle bundle = new Bundle();
@@ -515,7 +481,7 @@ public class Item_follow_fragment_21 extends Fragment
     @SuppressLint("SetJavaScriptEnabled")
     @SuppressWarnings("deprecation")
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView");
         if (!hasPermissionsGranted(VIDEO_PERMISSIONS)) {
@@ -566,92 +532,18 @@ public class Item_follow_fragment_21 extends Fragment
         bTnLayout = (ScaleRelativeLayout) view.findViewById(R.id.button_layout);
         cameraLayout = (ScaleFrameLayout) view.findViewById(R.id.video_layout);
         main = (ScaleRelativeLayout) view.findViewById(R.id.item_mainLayout);
-        record.setOnTouchListener(new View.OnTouchListener() {
+        record.setOnClickListener(this);
+        load.setOnClickListener(this);
+        play.setOnClickListener(this);
+        play_recordBtn.setOnClickListener(this);
+        camerachange.setOnClickListener(this);
+        videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (mTextureView.getVisibility() == View.INVISIBLE) {
-                mTextureView.setVisibility(View.VISIBLE);
-                }
-                if (mTextureView != null) {
-                    if (mIsRecordingVideo) {
-                        stopRecordingVideo();
-                        record.setImageResource(R.drawable.record);
-                    } else {
-                        videoView.setVisibility(View.INVISIBLE);
-                        mTextureView.setVisibility(View.VISIBLE);
-                        record.setImageResource(R.drawable.stop);
-                        startRecordingVideo();
-                    }
-                }
-                return false;
-            }
-        });
-        load.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                Log.d(TAG, "load click");
-                videoString = null;
-                videopath = null;
-                Intent intent = new Intent();
-                intent.setType("video/mp4");
-                intent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(Intent.createChooser(intent, "Select Video"), SELECT_MOVIE);
-                return false;
-            }
-        });
-        play.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if(videoView.isPlaying()){
-                    videoView.pause();
-                    play.setImageResource(R.drawable.play);
-                }else {
-                    videoView.start();
-                    play.setImageResource(R.drawable.pause);
-                    mTextureView.setVisibility(View.INVISIBLE);
-                    videoView.setVisibility(View.VISIBLE);
-                }
-                return false;
-            }
-        });
-        play_recordBtn.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if(play_record){
-                    if(mIsRecordingVideo){
-                        stopRecordingVideo();
-                    }
-                    closeCamera();
-                    mTextureView.setVisibility(View.INVISIBLE);
-                    videoView.setVisibility(View.VISIBLE);
-                    play_record = false;
-                } else {
-                    if(videoView.isPlaying()){
-                        videoView.stopPlayback();
-                    }
-                    if(getResources().getConfiguration().orientation == ORIENTATION_PORTRAIT) {
-                        openCamera(mTextureView.getWidth(), mTextureView.getHeight());
-                    }else {
-                        openCamera(mTextureView.getHeight(), mTextureView.getWidth());
-                    }
-                    startPreview();
-                    mTextureView.setVisibility(View.VISIBLE);
-                    videoView.setVisibility(View.INVISIBLE);
-                    play_record = true;
-                }
-                ButtonImageSetUp();
-                return false;
-            }
-        });
-        camerachange.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switchCamera();
-                return false;
+            public void onCompletion(MediaPlayer mp) {
+                play.setImageResource(R.drawable.play);
             }
         });
     }
-
     private void ButtonImageSetUp(){
         if(videoView.isPlaying()){
             play.setImageResource(R.drawable.pause);
@@ -834,10 +726,6 @@ public class Item_follow_fragment_21 extends Fragment
         }
     }
 
-    public static void setAutoOrientationEnabled(Context context, boolean enabled)
-    {
-        Settings.System.putInt( context.getContentResolver(), Settings.System.ACCELEROMETER_ROTATION, enabled ? 1 : 0);
-    }
     private boolean hasPermissionsGranted(String[] permissions) {
         for (String permission : permissions) {
             if (ActivityCompat.checkSelfPermission(getActivity(), permission)
@@ -876,7 +764,6 @@ public class Item_follow_fragment_21 extends Fragment
             mPreviewSize = chooseOptimalSize(map.getOutputSizes(SurfaceTexture.class),
                     width, height, mVideoSize);
             configureTransform(width, height);
-            mMediaRecorder = new MediaRecorder();
             if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                 // TODO: Consider calling
                 //    ActivityCompat#requestPermissions
@@ -1031,6 +918,7 @@ public class Item_follow_fragment_21 extends Fragment
         if (null == activity) {
             return;
         }
+        mMediaRecorder = new MediaRecorder();
         mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
         mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
@@ -1052,25 +940,19 @@ public class Item_follow_fragment_21 extends Fragment
                 mMediaRecorder.setOrientationHint(INVERSE_ORIENTATIONS.get(rotation));
                 break;
         }
-        mMediaRecorder.prepare();
+        try {
+            mMediaRecorder.prepare();
+        } catch (IOException e) {
+            Log.e(TAG, "prepare() failed = " + e.toString());
+        }
+        mMediaRecorder.start();
+        mIsRecordingVideo = true;
     }
+    @NonNull
     private String getVideoFilePath(Context context) {
-        Boolean isSDPresent = android.os.Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED);
-        Boolean isSDSupportedDevice = Environment.isExternalStorageRemovable();
-
-        if(isSDSupportedDevice && isSDPresent)
-        {
-            // yes SD-card is present
-            return Environment.getExternalStorageDirectory() + "/"
-                    + "ViewBody_" +System.currentTimeMillis() + ".mp4";
-        }
-        else
-        {
-            // Sorry
-            return
-                    Environment.DIRECTORY_PICTURES + "/"
-                    + "ViewBody_" +System.currentTimeMillis() + ".mp4";
-        }
+        final File dir = context.getExternalFilesDir( null);
+        return (dir == null ? "" : (Environment.getExternalStorageDirectory() + "/" +Environment.DIRECTORY_MOVIES + "/"))
+                + "ViewBody_" +System.currentTimeMillis() + ".mp4";
     }
 
     public void startRecordingVideo() {
@@ -1078,7 +960,6 @@ public class Item_follow_fragment_21 extends Fragment
             return;
         }
         try {
-            Log.d("Video_", "Start");
             closePreviewSession();
             setUpMediaRecorder();
             SurfaceTexture texture = mTextureView.getSurfaceTexture();
@@ -1109,10 +990,12 @@ public class Item_follow_fragment_21 extends Fragment
                         @Override
                         public void run() {
                             // UI
-                            mIsRecordingVideo = true;
+                            Log.d("Video_", "Start");
+                            record.setImageResource(R.drawable.stop);
+                            //mIsRecordingVideo = true;
 
                             // Start recording
-                            mMediaRecorder.start();
+                            //mMediaRecorder.start();
                         }
                     });
                 }
@@ -1142,6 +1025,7 @@ public class Item_follow_fragment_21 extends Fragment
         // UI
         mIsRecordingVideo = false;
         // Stop recording
+        record.setImageResource(R.drawable.record);
         mMediaRecorder.stop();
         mMediaRecorder.reset();
         // CameraHelper.getOutputMediaFile(2);
@@ -1155,6 +1039,77 @@ public class Item_follow_fragment_21 extends Fragment
         Log.d("Video_", "Stop");
         mNextVideoAbsolutePath = null;
         startPreview();
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.record_Btn://녹화
+                Log.d(TAG, "record_Btn thouch");
+                if (mTextureView.getVisibility() == View.INVISIBLE) {
+                    mTextureView.setVisibility(View.VISIBLE);
+                }
+                if (mTextureView != null) {
+                    if (mIsRecordingVideo) {
+                        stopRecordingVideo();
+                    } else {
+                        videoView.setVisibility(View.INVISIBLE);
+                        mTextureView.setVisibility(View.VISIBLE);
+                        startRecordingVideo();
+                    }
+                }
+                break;
+            case R.id.play_Btn://재생
+                Log.d(TAG, "play_Btn thouch");
+                if(videoView.isPlaying()){
+                    videoView.pause();
+                    play.setImageResource(R.drawable.play);
+                }else {
+                    videoView.start();
+                    play.setImageResource(R.drawable.pause);
+                    mTextureView.setVisibility(View.INVISIBLE);
+                    videoView.setVisibility(View.VISIBLE);
+                }
+                break;
+            case R.id.load_Btn://파일불러오기
+                videoString = null;
+                videopath = null;
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                Uri uri = Uri.parse(Environment.getExternalStorageDirectory().getPath()
+                        +  File.separator + Environment.DIRECTORY_MOVIES + File.separator);
+                intent.setDataAndType(uri, "video/mp4");
+                startActivityForResult(Intent.createChooser(intent, "Select Video"), 2);
+                break;
+            case R.id.play_record://파일과 카메라간 변환
+                if(play_record){
+                    if(mIsRecordingVideo){
+                        stopRecordingVideo();
+                    }
+                    closeCamera();
+                    mTextureView.setVisibility(View.INVISIBLE);
+                    videoView.setVisibility(View.VISIBLE);
+                    play_record = false;
+                } else {
+                    if(videoView.isPlaying()){
+                        videoView.stopPlayback();
+                    }
+                    if(getResources().getConfiguration().orientation == ORIENTATION_PORTRAIT) {
+                        openCamera(mTextureView.getWidth(), mTextureView.getHeight());
+                    }else {
+                        openCamera(mTextureView.getHeight(), mTextureView.getWidth());
+                    }
+                    startPreview();
+                    mTextureView.setVisibility(View.VISIBLE);
+                    videoView.setVisibility(View.INVISIBLE);
+                    play_record = true;
+                }
+                ButtonImageSetUp();
+                break;
+            case R.id.viewChange_Btn://전후면 카메라변환
+                Log.d(TAG, "viewChange_Btn thouch");
+                switchCamera();
+                break;
+        }
     }
 
     /**
