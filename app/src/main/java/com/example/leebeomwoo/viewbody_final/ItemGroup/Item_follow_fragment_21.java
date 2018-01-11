@@ -1076,7 +1076,8 @@ public class Item_follow_fragment_21 extends Fragment implements FragmentCompat.
                 Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
                 Uri uri = Uri.parse(Environment.getExternalStorageDirectory().getPath()
                         +  File.separator + Environment.DIRECTORY_MOVIES + File.separator);
-                intent.setDataAndType(uri, "video/mp4");
+                intent.setType("video/mp4");
+                intent.putExtra(Intent.EXTRA_STREAM, uri);
                 startActivityForResult(Intent.createChooser(intent, "Select Video"), 2);
                 break;
             case R.id.play_record://파일과 카메라간 변환
